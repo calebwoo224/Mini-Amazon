@@ -31,6 +31,8 @@ class Item(db.Model):
     name = db.Column(db.String(30))
     price = db.Column(db.Float, nullable=False)
     quantity = db.Column(db.Integer, nullable=False)
+    avg_user_rating = db.Column(db.Float, nullable=False)  # how/where will we calculate this?
+    decription = db.Column(db.String(400), nullable=False, default = "")
 
     def __repr__(self):
         return '<Item {}>'.format(self.name)
