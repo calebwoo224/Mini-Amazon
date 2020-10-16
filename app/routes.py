@@ -2,10 +2,11 @@ from flask import Flask, render_template, redirect, url_for, flash, request
 from flask_sqlalchemy import SQLAlchemy
 from app import app
 from app import db
-from app.forms import LoginForm, AddItemForm, AddtoCart
+from app.forms import LoginForm, AddItemForm, AddtoCart, AddReviewForm
 from flask_login import current_user, login_user, logout_user, login_required
-from app.models import User, Item, Cart
 import logging
+from app.models import User, Item, Cart, Reviews
+from datetime import datetime
 
 
 @app.route('/')
@@ -115,3 +116,30 @@ def get_cart(user_id):
     user = User.query.filter_by(id=user_id)
     cart = user.cart
     return cart
+  
+
+@app.route('/add_review', methods=['GET', 'POST'])
+def add_review():
+    form = AddReviewForm()
+    if form.validate_on_submit():
+        date = '' + str(datetime.now().month) + '/' + str(datetime.now().day) + '/' + str(datetime.now().year)
+        review = Reviews(user_id=current_user.id, item_id=int(form.item.data[0]), date_time=date,
+        location=form.location.data, stars=form.stars.data, content=form.content.data)
+        db.session.add(review)
+        db.session.commit()
+        return redirect(url_for('index'))
+    return render_template('add_review.html', title='Add Review', form=form)
+
+
+def get_review(user_id, item_id, date_time):
+    review = Reviews.query.filter_by(user_id=user_id, item_id=item_id, date_time=date_time).first()
+    if review is None:
+        flash("Review doesn't exist")
+    return review
+
+@app.route('/reviews', methods=['GET', 'POST'])
+def reviews():
+    all_reviews = db.session.query(Reviews, User, Item).join(User,
+                                                   (Reviews.user_id == User.id)).join(Item,
+                                                   (Reviews.item_id == Item.id)).all()
+    return render_template('reviews.html', reviews=all_reviews)

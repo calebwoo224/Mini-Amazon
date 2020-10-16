@@ -1,6 +1,6 @@
 from app import app
 from app import db
-from app.models import User, Item
+from app.models import User, Item, Reviews
 
 
 def seed_db():
