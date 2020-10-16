@@ -4,6 +4,7 @@ from app import app
 from app import db
 from app.forms import LoginForm, AddItemForm, AddtoCart, AddReviewForm
 from flask_login import current_user, login_user, logout_user, login_required
+import logging
 from app.models import User, Item, Cart, Reviews
 from datetime import datetime
 
@@ -24,6 +25,7 @@ def login():
         user = User.query.filter_by(username=form.username.data).first()
         if user is None or not user.check_password(form.password.data):
             flash('Invalid username or password')
+            logging.info("Invalid user {} tried to log in".format(form.username.data))
             return redirect(url_for('login'))
         login_user(user, remember=form.remember_me.data)
         return redirect(url_for('index'))
@@ -73,9 +75,14 @@ def add_to_cart(id, quantity):
     quantity = int(quantity)
     if Cart.query.filter_by(item_id=id, buyer_id=current_user.id).first() is not None:  # item already in cart
         cart = Cart.query.get((current_user.id, id))
+        item = get_item(cart.item_id)
+        if item.quantity < cart.cart_quantity + quantity:
+            flash('Choose a different quantity. Not enough in stock')
+            return redirect(url_for('item', id=item.id))
         cart.cart_quantity += quantity
     else:
         cart = Cart(buyer_id=current_user.id, item_id=id, cart_quantity=quantity)
+        logging.info("User {} added {} to cart}".format(current_user.username, item.name))
     db.session.add(cart)
     db.session.commit()
     flash('Successfully added {} item to cart'.format(quantity))
@@ -103,6 +110,13 @@ def total_price(cart_items):
     for i in cart_items:
         sum_price += (i.Item.price * i.Cart.cart_quantity)
     return sum_price
+
+
+def get_cart(user_id):
+    user = User.query.filter_by(id=user_id)
+    cart = user.cart
+    return cart
+  
 
 @app.route('/add_review', methods=['GET', 'POST'])
 def add_review():
