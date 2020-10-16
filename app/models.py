@@ -10,6 +10,7 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(120), unique=True)
     password_hash = db.Column(db.String(128))
     cart = db.relationship('Cart', backref='user')
+    reviews = db.relationship('Reviews', backref='user')
 
     def __repr__(self):
         return '<User {}>'.format(self.username)
@@ -31,6 +32,7 @@ class Item(db.Model):
     name = db.Column(db.String(30))
     price = db.Column(db.Float, nullable=False)
     quantity = db.Column(db.Integer, nullable=False)
+    reviews = db.relationship('Reviews', backref='item')
 
     def __repr__(self):
         return '<Item {}>'.format(self.name)
@@ -42,18 +44,18 @@ class Cart(db.Model):
     cart_quantity = db.Column(db.Integer, nullable=False)
 
 
-'''
+
 class Reviews(db.Model):
-    user_id = db.Column(db.Integer, db.ForeignKey('User.id'), primary_key=True)
-    item_id = db.Column(db.Integer, db.ForeignKey('Item.id'), primary_key=True)
-    date_time = db.Column(db.DateTime, nullable=False, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
+    item_id = db.Column(db.Integer, db.ForeignKey('item.id'), primary_key=True)
+    date_time = db.Column(db.String(10), nullable=False, primary_key=True)
     location = db.Column(db.String(120))
     stars = db.Column(db.Integer, nullable=False)
     content = db.Column(db.Text)
-    comment_thread = db.Column(db.String(1000))
+    #comment_thread = db.Column(db.String(1000))
 
     def __repr__(self):
-        return '<Reviews ({}, {}, {}, {}, {}, {}, {})>'.format(self.user_id, self.item_id, self.date_time, self.location, self.stars, self.content, self.comment_thread)
+        return '<Reviews ({}, {}, {}, {}, {}, {})>'.format(self.user_id, self.item_id, self.date_time, self.location, self.stars, self.content)
 
 # I think add this to User class
 # reviews = db.relationship('Reviews', backref='user_id')
@@ -61,6 +63,7 @@ class Reviews(db.Model):
 # I think add this to Item class
 # reviews = db.relationship('Reviews', backref='item_id')
 
+'''
 class SellerReviews(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('Usefr.id'), primary_key=True)
     seller_id = db.Column(db.Integer, db.ForeignKey('Seller.id'), primary_key=True)
