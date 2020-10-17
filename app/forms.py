@@ -20,10 +20,10 @@ class AddItemForm(FlaskForm):
 
 class AddtoCart(FlaskForm):
     item_quantity = SelectField(u'quantity')
-    submit = SubmitField('Add to Cart')
+    #submit = SubmitField('Add to Cart')
 
 class AddReviewForm(FlaskForm):
     location = StringField('Location')
     stars = IntegerField('Stars', validators=[DataRequired()])
     content = TextField('Write your review:', validators=[DataRequired()])
-    submit = SubmitField('Add Review')
+    #submit = SubmitField('Add Review')
