@@ -60,10 +60,18 @@ def get_item(item_id):
 def item(id):
     item = get_item(id)
     form = AddtoCart()
+    review_form = AddReviewForm()
     update_cart(item, form)
     if form.validate_on_submit():
         add_to_cart(item.id, form.item_quantity.data)
-    return render_template('item.html', item=item, form=form)
+    if review_form.validate_on_submit():
+        date = '' + str(datetime.now().month) + '/' + str(datetime.now().day) + '/' + str(datetime.now().year)
+        add_review(item.id, item.name, date, review_form.location.data, review_form.stars.data, review_form.content.data)
+        logging.info("User (id: {}, username: {}) added review for Item (id: {}, name: {}) on {}".format(current_user.id, current_user.username, item.id, item.name, date))
+    all_reviews = db.session.query(Reviews, User, Item).join(User,
+                                                   (Reviews.user_id == User.id)).join(Item,
+                                                   (Reviews.item_id == id)).all()
+    return render_template('item.html', item=item, form=form, review_form=review_form, reviews=all_reviews)
 
 
 def update_cart(item, form):
@@ -87,6 +95,14 @@ def add_to_cart(id, quantity):
     db.session.add(cart)
     db.session.commit()
     flash('Successfully added {} item to cart'.format(quantity))
+    return redirect(url_for('item', id=id))
+    
+def add_review(id, name, date, location, stars, content):
+    review = Reviews(user_id=current_user.id, item_id=id, date_time=date, 
+    location=location, stars=stars, content=content)
+    db.session.add(review)
+    db.session.commit()
+    flash('Successfully added review for item {}'.format(name))
     return redirect(url_for('item', id=id))
 
 
@@ -118,30 +134,3 @@ def get_cart(user_id):
     user = User.query.filter_by(id=user_id)
     cart = user.cart
     return cart
-  
-
-@app.route('/add_review', methods=['GET', 'POST'])
-def add_review():
-    form = AddReviewForm()
-    if form.validate_on_submit():
-        date = '' + str(datetime.now().month) + '/' + str(datetime.now().day) + '/' + str(datetime.now().year)
-        review = Reviews(user_id=current_user.id, item_id=int(form.item.data[0]), date_time=date,
-        location=form.location.data, stars=form.stars.data, content=form.content.data)
-        db.session.add(review)
-        db.session.commit()
-        return redirect(url_for('index'))
-    return render_template('add_review.html', title='Add Review', form=form)
-
-
-def get_review(user_id, item_id, date_time):
-    review = Reviews.query.filter_by(user_id=user_id, item_id=item_id, date_time=date_time).first()
-    if review is None:
-        flash("Review doesn't exist")
-    return review
-
-@app.route('/reviews', methods=['GET', 'POST'])
-def reviews():
-    all_reviews = db.session.query(Reviews, User, Item).join(User,
-                                                   (Reviews.user_id == User.id)).join(Item,
-                                                   (Reviews.item_id == Item.id)).all()
-    return render_template('reviews.html', reviews=all_reviews)
