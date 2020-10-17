@@ -16,7 +16,7 @@
             <span style="color: red;">[{{ error }}]</span>
             {% endfor %}
         </p>
-        <p>{{ form.submit() }}</p>
+        <input type='submit' name='cart' value='Add to cart'>
     </form>
     <h2>Reviews</h2>
     <table>
@@ -61,6 +61,6 @@
             <span style="color: red;">[{{ error }}]</span>
             {% endfor %}
         </p>
-        <p>{{ review_form.submit() }}</p>
+        <input type='submit' name='review' value='Add review'>
     </form>
 {% endblock %}

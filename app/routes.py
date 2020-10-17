@@ -62,9 +62,9 @@ def item(id):
     form = AddtoCart()
     review_form = AddReviewForm()
     update_cart(item, form)
-    if form.validate_on_submit():
+    if 'cart' in request.form:
         add_to_cart(item.id, form.item_quantity.data)
-    if review_form.validate_on_submit():
+    if 'review' in request.form:
         date = '' + str(datetime.now().month) + '/' + str(datetime.now().day) + '/' + str(datetime.now().year)
         add_review(item.id, item.name, date, review_form.location.data, review_form.stars.data, review_form.content.data)
         logging.info("User (id: {}, username: {}) added review for Item (id: {}, name: {}) on {}".format(current_user.id, current_user.username, item.id, item.name, date))
