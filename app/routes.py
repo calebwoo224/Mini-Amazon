@@ -82,7 +82,8 @@ def add_to_cart(id, quantity):
         cart.cart_quantity += quantity
     else:
         cart = Cart(buyer_id=current_user.id, item_id=id, cart_quantity=quantity)
-        logging.info("User {} added {} to cart}".format(current_user.username, item.name))
+        item = get_item(cart.item_id)
+        logging.info("User {} added {} to cart".format(current_user.username, item.name))
     db.session.add(cart)
     db.session.commit()
     flash('Successfully added {} item to cart'.format(quantity))
@@ -92,6 +93,7 @@ def add_to_cart(id, quantity):
 @app.route('/<item_id>/delete_from_cart', methods=['GET', 'POST'])
 def delete_from_cart(item_id):
     item = Cart.query.filter_by(item_id=item_id, buyer_id=current_user.id).first()
+    logging.info("User {} deleted an item from cart".format(current_user.username))
     db.session.delete(item)
     db.session.commit()
     return redirect(url_for('cart'))
