@@ -46,12 +46,9 @@ class Cart(db.Model):
 
 
 class Reviews(db.Model):
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
-    item_id = db.Column(db.Integer, db.ForeignKey('item.id'), primary_key=True)
-    date_time = db.Column(db.String(10), nullable=False, primary_key=True)
-    location = db.Column(db.String(120))
-    stars = db.Column(db.Integer, nullable=False)
-    content = db.Column(db.Text)
+    reviews = db.Table('reviews', db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
+    db.Column('item_id', db.Integer, db.ForeignKey('item.id'), primary_key=True), db.Column('date_time', db.String(10), nullable=False),
+    db.Column('location', db.String(120)), db.Column('stars', db.Integer, nullable=False), db.Column('content', db.Text, primary_key=True))
     #comment_thread = db.Column(db.String(1000))
 
     def __repr__(self):
