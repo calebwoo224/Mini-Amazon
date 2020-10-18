@@ -11,6 +11,9 @@ class User(UserMixin, db.Model):
     password_hash = db.Column(db.String(128))
     cart = db.relationship('Cart', backref='user')
     reviews = db.relationship('Reviews', backref='user')
+    type = db.Column(db.String(50))
+    __mapper_args__ = {'polymorphic_identity':'user','polymorphic_on':type}
+
 
     def __repr__(self):
         return '<User {}>'.format(self.username)
@@ -27,13 +30,29 @@ def load_user(id):
     return User.query.get(int(id))
 
 
+
+
+class Seller(User):
+    __tablename__ = 'Seller'
+    __mapper_args__ = {'polymorphic_identity':'seller'}
+    seller_id = db.Column('id', db.Integer, db.ForeignKey('user.id'),primary_key=True)
+    sells = db.relationship('Item', backref='seller')
+    def __repr__(self):
+        return '<Seller {}>'.format(self.seller_id)
+
+
+
+
+
+
+
 class Item(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(30))
     price = db.Column(db.Float, nullable=False)
     quantity = db.Column(db.Integer, nullable=False)
     reviews = db.relationship('Reviews', backref='item')
-
+    merchant_id = db.Column(db.Integer, db.ForeignKey('Seller.id'))
     def __repr__(self):
         return '<Item {}>'.format(self.name)
 
@@ -53,6 +72,10 @@ class Reviews(db.Model):
 
     def __repr__(self):
         return '<Reviews ({}, {}, {}, {}, {}, {})>'.format(self.user_id, self.item_id, self.date_time, self.location, self.stars, self.content)
+
+
+
+
 
 # I think add this to User class
 # reviews = db.relationship('Reviews', backref='user_id')
