@@ -36,7 +36,7 @@ class Seller(User):
     __tablename__ = 'Seller'
     __mapper_args__ = {'polymorphic_identity':'seller'}
     seller_id = db.Column('id', db.Integer, db.ForeignKey('user.id'),primary_key=True)
-    sells = db.relationship('Item', backref='seller')
+    sells = db.relationship('Item', backref = 'seller', lazy = 'dynamic')
     def __repr__(self):
         return '<Seller {}>'.format(self.seller_id)
 
