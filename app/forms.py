@@ -27,3 +27,9 @@ class AddReviewForm(FlaskForm):
     stars = IntegerField('Stars', validators=[DataRequired()])
     content = TextField('Write your review:', validators=[DataRequired()])
     #submit = SubmitField('Add Review')
+
+class AddSellerReviewForm(FlaskForm):
+    location = StringField('Location')
+    stars = IntegerField('Stars', validators=[DataRequired()])
+    content = TextField('Write your review:', validators=[DataRequired()])
+    submit = SubmitField('Add Review')

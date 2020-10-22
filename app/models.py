@@ -11,6 +11,7 @@ class User(UserMixin, db.Model):
     password_hash = db.Column(db.String(128))
     cart = db.relationship('Cart', backref='user')
     reviews = db.relationship('Reviews', backref='user')
+    seller_reviews = db.relationship('SellerReviews', backref='user')
     type = db.Column(db.String(50))
     __mapper_args__ = {'polymorphic_identity':'user','polymorphic_on':type}
 
@@ -37,6 +38,7 @@ class Seller(User):
     __mapper_args__ = {'polymorphic_identity':'seller'}
     seller_id = db.Column('id', db.Integer, db.ForeignKey('user.id'),primary_key=True)
     sells = db.relationship('Item', backref = 'seller', lazy = 'dynamic')
+    seller_reviews = db.relationship('SellerReviews', backref='seller')
     def __repr__(self):
         return '<Seller {}>'.format(self.seller_id)
 
@@ -83,23 +85,18 @@ class Reviews(db.Model):
 # I think add this to Item class
 # reviews = db.relationship('Reviews', backref='item_id')
 
-'''
+
 class SellerReviews(db.Model):
-    user_id = db.Column(db.Integer, db.ForeignKey('Usefr.id'), primary_key=True)
-    seller_id = db.Column(db.Integer, db.ForeignKey('Seller.id'), primary_key=True)
-    date_time = db.Column(db.DateTime, nullable=False, primary_key=True)
-    location = db.Column(db.String(120))
-    stars = db.Column(db.Integer, nullable=False)
-    content = db.Column(db.Text)
-    comment_thread = db.Column(db.String(1000))
+    seller_reviews = db.Table('seller_reviews', db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
+    db.Column('seller_id', db.Integer, db.ForeignKey('Seller.id'), primary_key=True), db.Column('date_time', db.String(10), nullable=False),
+    db.Column('location', db.String(120)), db.Column('stars', db.Integer, nullable=False), db.Column('content', db.Text, primary_key=True))
+    #comment_thread = db.Column(db.String(1000))
 
     def __repr__(self):
-        return '<Seller Reviews ({}, {}, {}, {}, {}, {}, {})>'.format(self.user_id, self.seller_id, self.date_time, self.location, self.stars, self.content, self.comment_thread)
+        return '<Seller Reviews ({}, {}, {}, {}, {}, {})>'.format(self.user_id, self.seller_id, self.date_time, self.location, self.stars, self.content)
 
 # I think add this to User class
 # seller_reviews = db.relationship('SellerReviews', backref='user_id')
 
 # I think add this to Seller class
 # seller_reviews = db.relationship('SellerReviews', backref='seller_id')
-
-'''
