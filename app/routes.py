@@ -5,7 +5,7 @@ from app import db
 from app.forms import LoginForm, AddItemForm, AddtoCart, AddReviewForm
 from flask_login import current_user, login_user, logout_user, login_required
 import logging
-from app.models import User, Item, Cart, Reviews
+from app.models import User, Item, Cart, Reviews, Seller
 from datetime import datetime
 
 
@@ -134,3 +134,21 @@ def get_cart(user_id):
     user = User.query.filter_by(id=user_id)
     cart = user.cart
     return cart
+    
+    
+    
+    
+@app.route('/seller_summary', methods=['GET', 'POST'])
+def seller_summary():
+  items = sellerItems(current_user)
+  return render_template('seller_summary.html', items = items)
+
+def sellerItems(seller):
+  items = seller.sells.all()
+  return items
+  
+
+
+
+
+
