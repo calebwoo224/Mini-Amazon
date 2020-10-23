@@ -14,8 +14,14 @@ def seed_db():
     db.session.add(user)
     db.session.add(user2)
 
-    item = Item(name='pen', price=3.00, quantity=30)
+    # Issue implementing category
+    # category = Category(category_id='0000', name='Office Supplies')
+    # db.session.add(category)
+    # item = Item(id="1", name='pen', price=3.00, quantity=30, category='Office Supplies')
+
+    item = Item(id = "1", name='pen', price=3.00, quantity=30, description = "blue ballpoint pen", is_for_sale = True)
     db.session.add(item)
+
 
     db.session.commit()
 

@@ -1,5 +1,6 @@
 INFO:werkzeug: * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
-INFO:werkzeug:127.0.0.1 - - [15/Oct/2020 21:13:14] "GET /login HTTP/1.1" 200 -
-INFO:root:Invalid user asdf tried to log in
-INFO:werkzeug:127.0.0.1 - - [15/Oct/2020 21:13:20] "POST /login HTTP/1.1" 302 -
-INFO:werkzeug:127.0.0.1 - - [15/Oct/2020 21:13:20] "GET /login HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Oct/2020 20:23:22] "GET / HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Oct/2020 20:23:25] "GET /add_item HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Oct/2020 20:24:06] "POST /add_item HTTP/1.1" 302 -
+INFO:werkzeug:127.0.0.1 - - [22/Oct/2020 20:24:06] "GET /index HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Oct/2020 20:24:07] "GET /2/item HTTP/1.1" 200 -
