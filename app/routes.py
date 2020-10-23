@@ -49,6 +49,17 @@ def add_item():
         return redirect(url_for('index'))
     return render_template('add_item.html', title='Add Item', form=form)
 
+app.route('/add_category', methods=['GET', 'POST'])
+def add_category():
+    form = AddItemForm()
+    if form.validate_on_submit():
+        item = Item(id = form.id.data, name=form.name.data, price=form.price.data, quantity=form.quantity.data,
+                    description = form.description.data, is_for_sale = form.is_for_sale.data)
+        db.session.add(item)
+        db.session.commit()
+        return redirect(url_for('index'))
+    return render_template('add_item.html', title='Add Item', form=form)
+
 
 def get_item(item_id):
     item = Item.query.filter_by(id=item_id).first()
