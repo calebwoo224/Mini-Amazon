@@ -1,6 +1,7 @@
 from app import app
 from app import db
-from app.models import User, Item, Reviews, Seller, SellerReviews
+
+from app.models import User, Item, Reviews, Seller, OrderHistory, SellerReviews
 
 
 def seed_db():
@@ -22,7 +23,6 @@ def seed_db():
     
     db.session.commit()
 
-    
     seller1 = Seller(username='test3', email='test3@example.com')
     seller1.set_password('123')
     db.session.add(seller1)
@@ -31,10 +31,8 @@ def seed_db():
     db.session.add(seller2)
     db.session.commit()   
     
-    
-    
-    
-    item = Item(name='pens', price=3.00, quantity=30, seller = seller1)
+    item = Item(name='pens', price=3.00, quantity=30, seller=seller1)
+
     db.session.add(item)
     item2 = Item(name='books', price=0.90, quantity=400, seller = seller2)
     db.session.add(item2)
@@ -45,12 +43,8 @@ def seed_db():
     item5 = Item(name='Tachyons', price=45.00, quantity=211, seller = seller1)
     db.session.add(item5)
 
-    
     #items = seller1.sells.all()
     #print(items)
-    
-    
-    
     db.session.commit()
     
 

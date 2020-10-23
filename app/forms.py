@@ -22,6 +22,7 @@ class AddtoCart(FlaskForm):
     item_quantity = SelectField(u'quantity')
     #submit = SubmitField('Add to Cart')
 
+
 class AddReviewForm(FlaskForm):
     location = StringField('Location')
     stars = IntegerField('Stars', validators=[DataRequired()])
