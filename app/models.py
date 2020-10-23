@@ -12,7 +12,7 @@ class User(UserMixin, db.Model):
     cart = db.relationship('Cart', backref='user')
     reviews = db.relationship('Reviews', backref='user')
     type = db.Column(db.String(50))
-    __mapper_args__ = {'polymorphic_identity':'user','polymorphic_on':type}
+    __mapper_args__ = {'polymorphic_identity': 'user', 'polymorphic_on': type}
 
 
     def __repr__(self):
@@ -53,6 +53,7 @@ class Item(db.Model):
     quantity = db.Column(db.Integer, nullable=False)
     reviews = db.relationship('Reviews', backref='item')
     merchant_id = db.Column(db.Integer, db.ForeignKey('Seller.id'))
+
     def __repr__(self):
         return '<Item {}>'.format(self.name)
 
@@ -62,6 +63,17 @@ class Cart(db.Model):
     item_id = db.Column(db.String(10), db.ForeignKey('item.id'), primary_key=True)
     cart_quantity = db.Column(db.Integer, nullable=False)
 
+
+class OrderHistory(db.Model):
+    item_id = db.Column(db.Integer, db.ForeignKey('item.id'), primary_key=True)
+    buyer_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
+    datetime = db.Column(db.DateTime, primary_key=True)
+    quantity_sold = db.Column(db.Integer, nullable=False)
+    price_sold = db.Column(db.Float, nullable=False)
+    '''
+    def __repr__(self):
+        return 'Order <{}>'.format(self.order_id)
+    '''
 
 
 class Reviews(db.Model):

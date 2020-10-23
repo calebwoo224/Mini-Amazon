@@ -5,8 +5,9 @@ from app import db
 from app.forms import LoginForm, AddItemForm, AddtoCart, AddReviewForm
 from flask_login import current_user, login_user, logout_user, login_required
 import logging
-from app.models import User, Item, Cart, Reviews
+from app.models import User, Item, Cart, Reviews, OrderHistory
 from datetime import datetime
+from sqlalchemy import desc
 
 
 @app.route('/')
@@ -63,6 +64,9 @@ def item(id):
     review_form = AddReviewForm()
     update_cart(item, form)
     if 'cart' in request.form:
+        if current_user.is_anonymous:
+            flash('To add an item to cart, please login')
+            return redirect(url_for('item', id=id))
         add_to_cart(item.id, form.item_quantity.data)
     if 'review' in request.form:
         date = '' + str(datetime.now().month) + '/' + str(datetime.now().day) + '/' + str(datetime.now().year)
@@ -96,7 +100,8 @@ def add_to_cart(id, quantity):
     db.session.commit()
     flash('Successfully added {} item to cart'.format(quantity))
     return redirect(url_for('item', id=id))
-    
+
+
 def add_review(id, name, date, location, stars, content):
     review = Reviews(user_id=current_user.id, item_id=id, date_time=date, 
     location=location, stars=stars, content=content)
@@ -123,6 +128,35 @@ def cart():
     return render_template('cart.html', cart=cart_items, price=price)
 
 
+@app.route('/<user_id>/checkout', methods=['GET', "POST"])
+def checkout(user_id):
+    user_cart = get_cart(user_id)
+    logging.info("In the process of checkout")
+    # checkout_date = datetime.strftime(datetime.now(), "%m-%d-%Y, %H:%M:%S")
+    checkout_date = datetime.now()
+    for cart_item in user_cart:
+        # update item quantity
+        db_item = get_item(cart_item.item_id)
+        new_quantity = db_item.quantity - cart_item.cart_quantity
+        if new_quantity < 0:
+            flash("Item {} no longer available in this quantity. Not included in final checkout".format(db_item.name))
+            continue
+        db_item.quantity = new_quantity
+        db.session.commit()
+
+        # checkout
+        oh = OrderHistory(item_id=cart_item.item_id,
+                          buyer_id=user_id,
+                          datetime=checkout_date,
+                          quantity_sold=cart_item.cart_quantity,
+                          price_sold=db_item.price)
+        # remove from cart
+        db.session.delete(cart_item)
+        db.session.add(oh)
+        db.session.commit()
+    return redirect(url_for("cart"))
+
+
 def total_price(cart_items):
     sum_price = 0
     for i in cart_items:
@@ -131,6 +165,33 @@ def total_price(cart_items):
 
 
 def get_cart(user_id):
-    user = User.query.filter_by(id=user_id)
-    cart = user.cart
-    return cart
+    user = User.query.filter_by(id=user_id).first()
+    u_cart = user.cart
+    return u_cart
+
+
+@app.route('/<user_id>/order_history', methods=['GET', "POST"])
+def order_history(user_id):
+    u_history = db.session.query(OrderHistory,
+                                 Item).join(Item,
+                                            (OrderHistory.item_id
+                                             == Item.id)).filter(OrderHistory.buyer_id
+                                                                 == user_id).order_by(desc(OrderHistory.datetime)).all()
+    # user_history = OrderHistory.query.filter_by(buyer_id=user_id).order_by(desc(OrderHistory.datetime))
+    orders = []
+    for entry in u_history:
+        logging.info(entry.Item.name)
+        curr_datetime = datetime.strftime(entry.OrderHistory.datetime, "%m-%d-%Y, %H:%M:%S")
+        if len(orders) == 0:
+            orders.append({
+                "datetime": curr_datetime,
+                "orders": []
+            })
+        elif orders[-1]["datetime"] != curr_datetime:
+            orders.append({
+                "datetime": curr_datetime,
+                "orders": []
+            })
+        orders[-1]["orders"].append(entry)
+
+    return render_template('order_history.html', history=orders)
