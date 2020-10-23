@@ -2,10 +2,10 @@ from flask import Flask, render_template, redirect, url_for, flash, request
 from flask_sqlalchemy import SQLAlchemy
 from app import app
 from app import db
-from app.forms import LoginForm, AddItemForm, AddtoCart, AddReviewForm
+from app.forms import LoginForm, AddItemForm, AddtoCart, AddReviewForm, AddSellerReviewForm
 from flask_login import current_user, login_user, logout_user, login_required
 import logging
-from app.models import User, Item, Cart, Reviews, OrderHistory
+from app.models import User, Item, Cart, Reviews, OrderHistory, Seller, SellerReviews
 from datetime import datetime
 from sqlalchemy import desc
 
@@ -194,4 +194,40 @@ def order_history(user_id):
             })
         orders[-1]["orders"].append(entry)
 
-    return render_template('order_history.html', history=orders)
+    return render_template('order_history.html', history=orders) 
+
+    
+@app.route('/seller_summary', methods=['GET', 'POST'])
+def seller_summary():
+  items = sellerItems(current_user)
+  return render_template('seller_summary.html', items = items)
+
+def sellerItems(seller):
+  items = seller.sells.all()
+  return items
+
+@app.route('/seller_reviews', methods=['GET', 'POST'])
+def seller_reviews():
+    sellers = Seller.query.all()
+    return render_template('seller_reviews.html', title='Seller Reviews', sellers=sellers)
+
+@app.route('/<id>/add_seller_review', methods=['GET', 'POST'])
+def add_seller_review(id):
+    seller = Seller.query.filter_by(seller_id=id).first()
+    form = AddSellerReviewForm()
+    if form.validate_on_submit():
+        date = '' + str(datetime.now().month) + '/' + str(datetime.now().day) + '/' + str(datetime.now().year)
+        add_review(seller.seller_id, seller.username, date, form.location.data, form.stars.data, form.content.data)
+        logging.info("User (id: {}, username: {}) added review for Seller (id: {}, username: {}) on {}".format(current_user.id, current_user.username, seller.seller_id, seller.username, date))
+    all_reviews = db.session.query(SellerReviews, User, Seller).join(User,
+                                                   (SellerReviews.user_id == User.id)).join(Seller,
+                                                   (SellerReviews.seller_id == id)).all()
+    return render_template('add_seller_review.html', seller=seller, form=form, reviews=all_reviews)
+
+def add_review(id, name, date, location, stars, content):
+    review = SellerReviews(user_id=current_user.id, seller_id=id, date_time=date, 
+    location=location, stars=stars, content=content)
+    db.session.add(review)
+    db.session.commit()
+    flash('Successfully added seller review for seller {}'.format(name))
+    return redirect(url_for('add_seller_review', id=id))
