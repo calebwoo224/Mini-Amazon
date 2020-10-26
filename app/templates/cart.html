@@ -2,6 +2,7 @@
 
 {% block content %}
     <h1>{{ current_user.username }}'s Cart</h1>
+    <meta id="my_user_id" data-id="{{ current_user.username }}">
     <table>
         <tr>
             <th>Item</th>
@@ -9,10 +10,28 @@
             <th>Quantity</th>
         </tr>
         {% for item in cart %}
+            <script>
+                function buttonClick(x ) {
+                    var value = parseInt(document.getElementById('inc').value, 10);
+                    value = isNaN(value) ? 0 : value;
+                    alert(x)
+                    params = x
+                    let xhr = new XMLHttpRequest();
+                    xhr.open('POST', "/edit_cart_quantity", true)
+                    xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+                    xhr.onreadystatechange = function () {//Call a function when the state changes.
+                        if (xhr.readyState == 4 && xhr.status == 200) {
+                            console.log(xhr.responseText);
+                        }
+                        xhr.send(params);
+                    }
+                }
+            </script>
         <tr>
             <td><div><a class="action" href="{{ url_for('item', id=item.Item.id) }}">{{ item.Item.name }}</a></div></td>
             <td>${{ item.Item.price }}</td>
-            <td>{{ item.Cart.cart_quantity }}</td>
+            <td><button onclick='buttonClick({{ item.Item.id|tojson }})'>+</button>
+                <input type="text" id="inc" value={{ item.Cart.cart_quantity }} /></td>
             <td><a class="action" href="{{ url_for('delete_from_cart', item_id=item.Item.id) }}">Delete</a></td>
         </tr>
         {% endfor %}
