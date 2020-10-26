@@ -1,5 +1,7 @@
 <html>
     <head>
+        <script type="text/javascript" src="{{ url_for('static',filename='jquery.js') }}"></script>
+
       {% if title %}
       <title>{{ title }} - Mini Amazon</title>
       {% else %}
@@ -15,6 +17,7 @@
             {% else %}
                 <a href="{{ url_for('cart') }}">Cart</a>
                 <a href="{{ url_for('order_history', user_id=current_user.id) }}">Order History</a>
+                <a href="{{ url_for('trade_history', seller_id=current_user.id) }}">Trade History</a>
                 <a href="{{ url_for('logout') }}">Logout</a>
             {% endif %}
             <a href="{{ url_for('add_item') }}">Add Item</a>

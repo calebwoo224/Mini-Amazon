@@ -9,12 +9,14 @@
             <th>Item</th>
             <th>Price</th>
             <th>Quantity</th>
+            <th>Seller</th>
         </tr>
     {% for purchase in order["orders"] %}
         <tr>
             <td><div><a class="action" href="{{ url_for('item', id=purchase.Item.id) }}">{{ purchase.Item.name }}</a></div></td>
             <td>${{ purchase.OrderHistory.price_sold }}</td>
             <td>{{ purchase.OrderHistory.quantity_sold }}</td>
+            <td>{{ purchase.OrderHistory.seller_id }}</td>
         </tr>
     {% endfor %}
     </table>
