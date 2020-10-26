@@ -74,7 +74,7 @@ def item(id):
         logging.info("User (id: {}, username: {}) added review for Item (id: {}, name: {}) on {}".format(current_user.id, current_user.username, item.id, item.name, date))
     all_reviews = db.session.query(Reviews, User, Item).join(User,
                                                    (Reviews.user_id == User.id)).join(Item,
-                                                   (Reviews.item_id == id)).all()
+                                                   (Reviews.item_id == Item.id)).all()
     return render_template('item.html', item=item, form=form, review_form=review_form, reviews=all_reviews)
 
 
@@ -103,11 +103,14 @@ def add_to_cart(id, quantity):
 
 
 def add_review(id, name, date, location, stars, content):
-    review = Reviews(user_id=current_user.id, item_id=id, date_time=date, 
+    if Reviews.query.filter_by(user_id=current_user.id, item_id=id, content=content).first() is None:
+        review = Reviews(user_id=current_user.id, item_id=id, date_time=date, 
     location=location, stars=stars, content=content)
-    db.session.add(review)
-    db.session.commit()
-    flash('Successfully added review for item {}'.format(name))
+        db.session.add(review)
+        db.session.commit()
+        flash('Successfully added review for item {}'.format(name))
+    else:
+        flash('Review already exists')
     return redirect(url_for('item', id=id))
 
 
@@ -217,17 +220,20 @@ def add_seller_review(id):
     form = AddSellerReviewForm()
     if form.validate_on_submit():
         date = '' + str(datetime.now().month) + '/' + str(datetime.now().day) + '/' + str(datetime.now().year)
-        add_review(seller.seller_id, seller.username, date, form.location.data, form.stars.data, form.content.data)
+        add_a_review(seller.seller_id, seller.username, date, form.location.data, form.stars.data, form.content.data)
         logging.info("User (id: {}, username: {}) added review for Seller (id: {}, username: {}) on {}".format(current_user.id, current_user.username, seller.seller_id, seller.username, date))
     all_reviews = db.session.query(SellerReviews, User, Seller).join(User,
                                                    (SellerReviews.user_id == User.id)).join(Seller,
-                                                   (SellerReviews.seller_id == id)).all()
+                                                   (SellerReviews.seller_id == Seller.id)).all()
     return render_template('add_seller_review.html', seller=seller, form=form, reviews=all_reviews)
 
-def add_review(id, name, date, location, stars, content):
-    review = SellerReviews(user_id=current_user.id, seller_id=id, date_time=date, 
-    location=location, stars=stars, content=content)
-    db.session.add(review)
-    db.session.commit()
-    flash('Successfully added seller review for seller {}'.format(name))
+def add_a_review(id, name, date, location, stars, content):
+    if SellerReviews.query.filter_by(user_id=current_user.id, seller_id=id, content=content).first() is None:
+        review = SellerReviews(user_id=current_user.id, seller_id=id, date_time=date,
+        location=location, stars=stars, content=content)
+        db.session.add(review)
+        db.session.commit()
+        flash('Successfully added seller review for seller {}'.format(name))
+    else:
+        flash('Review already exists')
     return redirect(url_for('add_seller_review', id=id))
