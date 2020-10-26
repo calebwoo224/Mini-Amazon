@@ -43,7 +43,7 @@ def logout():
 def add_item():
     form = AddItemForm()
     if form.validate_on_submit():
-        item = Item(name=form.name.data, price=form.price.data, quantity=form.quantity.data)
+        item = Item(name=form.name.data, price=form.price.data, quantity=form.quantity.data, seller = current_user)
         db.session.add(item)
         db.session.commit()
         return redirect(url_for('index'))
