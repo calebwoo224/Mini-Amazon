@@ -231,3 +231,8 @@ def add_review(id, name, date, location, stars, content):
     db.session.commit()
     flash('Successfully added seller review for seller {}'.format(name))
     return redirect(url_for('add_seller_review', id=id))
+
+@app.route('/profile', methods=['GET', 'POST'])
+def profile():
+    u=User.query.filter_by(id=current_user.id).first()
+
