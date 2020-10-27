@@ -1,11 +1,9 @@
 <html>
 
-{% if title %}
-    <title>{% block title %}{% endblock %} - Mini Amazon</title>
-{% else %}
-    <title>Welcome to Mini Amazon</title>
-{% endif %}
+<title>{% block title %}{% endblock %} - Mini Amazon</title>
+
 <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<script type="text/javascript" src="{{ url_for('static',filename='jquery.js') }}"></script>
 
 <nav>
     <h1>Mini-Amazon</h1>

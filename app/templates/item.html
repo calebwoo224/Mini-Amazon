@@ -3,7 +3,11 @@
 {% block content %}
     <h1>{{ item.name }}</h1>
     <p>
-        Price: ${{ item.price }}<br>
+        Price: $
+        <script type="text/javascript">
+            var StringValue = parseFloat({{ item.price }});
+            document.write(StringValue.toFixed( 2 ));
+        </script><br>
         Quantity: {{ item.quantity }}<br>
         Seller: {{ item.seller }}<br>
     </p>

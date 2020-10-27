@@ -14,9 +14,14 @@
     {% for purchase in order["orders"] %}
         <tr>
             <td><div><a class="action" href="{{ url_for('item', id=purchase.Item.id) }}">{{ purchase.Item.name }}</a></div></td>
-            <td>${{ purchase.OrderHistory.price_sold }}</td>
+            <td>$
+                <script type="text/javascript">
+                    var StringValue = parseFloat({{ purchase.OrderHistory.price_sold }});
+                    document.write(StringValue.toFixed( 2 ));
+                </script>
+            </td>
             <td>{{ purchase.OrderHistory.quantity_sold }}</td>
-            <td>{{ purchase.OrderHistory.seller_id }}</td>
+            <td>{{ purchase.Seller.username }}</td>
         </tr>
     {% endfor %}
     </table>

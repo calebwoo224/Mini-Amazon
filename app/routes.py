@@ -195,7 +195,7 @@ def total_price(cart_items):
     sum_price = 0
     for i in cart_items:
         sum_price += (i.Item.price * i.Cart.cart_quantity)
-    return sum_price
+    return round(sum_price, 2)
 
 
 def get_cart(user_id):
@@ -206,11 +206,11 @@ def get_cart(user_id):
 
 @app.route('/<user_id>/order_history', methods=['GET', "POST"])
 def order_history(user_id):
-    u_history = db.session.query(OrderHistory,
-                                 Item).join(Item,
-                                            (OrderHistory.item_id
-                                             == Item.id)).filter(OrderHistory.buyer_id
-                                                                 == user_id).order_by(desc(OrderHistory.datetime)).all()
+    u_history = db.session.query(OrderHistory, Item,
+                                 Seller).join(Item, (OrderHistory.item_id ==
+                                                     Item.id)).join(Seller, (OrderHistory.seller_id ==
+                                                                             Seller.id)).filter(OrderHistory.buyer_id ==
+                                                                                                user_id).order_by(desc(OrderHistory.datetime)).all()
     orders = get_orders_by_time(u_history)
     return render_template('order_history.html', history=orders) 
 
