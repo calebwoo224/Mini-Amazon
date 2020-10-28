@@ -18,3 +18,14 @@ function increment(item_id) {
      */
 }
 
+function doubleCheck(price) {
+    var StringValue = parseFloat(price);
+    var agree = confirm("Are you sure you're ready to checkout?\nYou will be charged $" +
+        StringValue.toFixed( 2 ))
+
+    if (!agree) {
+        return false;
+    }
+    this.form.submit();
+
+}

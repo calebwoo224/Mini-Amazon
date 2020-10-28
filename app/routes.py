@@ -80,11 +80,17 @@ def item(id):
 
 def update_cart(item, form):
     quantity = item.quantity
-    form.item_quantity.choices = [num for num in range(1, quantity+1)]
+    if quantity == 0:
+        form.item_quantity.choices = [0]
+    else:
+        form.item_quantity.choices = [num for num in range(1, quantity+1)]
 
 
 def add_to_cart(id, quantity):
     quantity = int(quantity)
+    if quantity == 0:
+        flash("Item out of stock. Cannot add to cart")
+        return redirect(url_for('item', id=id))
     if Cart.query.filter_by(item_id=id, buyer_id=current_user.id).first() is not None:  # item already in cart
         cart = Cart.query.get((current_user.id, id))
         item = get_item(cart.item_id)
@@ -132,6 +138,10 @@ def cart():
             db.session.commit()
 
     price = total_price(cart_items)
+
+    if 'checkout' in request.form:
+        return checkout(current_user.id)
+
     return render_template('cart.html', cart=cart_items, price=price)
 
 
@@ -147,7 +157,7 @@ def get_user(user_id):
     return user
 
 
-@app.route('/<user_id>/checkout', methods=['GET', "POST"])
+# @app.route('/<user_id>/checkout', methods=['GET', "POST"])
 def checkout(user_id):
     cart_items = db.session.query(Cart, Item).join(Item,
                                                    (Cart.item_id == Item.id)).filter(Cart.buyer_id ==

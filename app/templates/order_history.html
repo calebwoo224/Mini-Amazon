@@ -1,10 +1,10 @@
 {% extends "base.html" %}
-
+{% block title %}Order History{% endblock %}
 {% block content %}
-    <h1>{{ current_user.username }}'s Order History</h1>
+    <h1>Order History</h1>
     {% for order in history %}
     <h3>Purchase Date: {{ order["datetime"] }}</h3>
-    <table>
+    <table class="purchases_table">
         <tr>
             <th>Item</th>
             <th>Price</th>
