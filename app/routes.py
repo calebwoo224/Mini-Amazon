@@ -268,7 +268,7 @@ def seller_reviews():
 def add_seller_review(id):
     seller = Seller.query.filter_by(seller_id=id).first()
     form = AddSellerReviewForm()
-    if form.validate_on_submit():
+    if 'review' in request.form:
         date = '' + str(datetime.now().month) + '/' + str(datetime.now().day) + '/' + str(datetime.now().year)
         add_s_review(seller.seller_id, seller.username, date, form.location.data, form.stars.data, form.content.data)
         logging.info("User (id: {}, username: {}) added review for "
@@ -276,7 +276,7 @@ def add_seller_review(id):
                                                                   seller.seller_id, seller.username, date))
     all_reviews = db.session.query(SellerReviews, User, Seller).join(User,
                                                    (SellerReviews.user_id == User.id)).join(Seller,
-                                                   (SellerReviews.seller_id == id)).all()
+                                                   (SellerReviews.seller_id == Seller.id)).filter(SellerReviews.seller_id==id).all()
     return render_template('add_seller_review.html', seller=seller, form=form, reviews=all_reviews)
 
 
