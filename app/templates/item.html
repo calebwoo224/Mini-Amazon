@@ -5,8 +5,7 @@
     <p>
         Price: $
         <script type="text/javascript">
-            var StringValue = parseFloat({{ item.price }});
-            document.write(StringValue.toFixed( 2 ));
+            formatPrice({{ item.price }});
         </script><br>
         Quantity: {{ item.quantity }}<br>
         Seller: {{ item.seller }}<br>

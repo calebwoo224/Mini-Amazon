@@ -6,33 +6,17 @@
         <tr>
             <th></th>
             <th>Item</th>
-            <th>Price</th>
             <th>Quantity</th>
+            <th>Price</th>
         </tr>
         {% for item in cart %}
-            <script>
-                function buttonClick(x ) {
-                    var value = parseInt(document.getElementById('inc').value, 10);
-                    value = isNaN(value) ? 0 : value;
-                    alert(x)
-                    params = x
-                    let xhr = new XMLHttpRequest();
-                    xhr.open('POST', "/edit_cart_quantity", true)
-                    xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-                    xhr.onreadystatechange = function () {//Call a function when the state changes.
-                        if (xhr.readyState == 4 && xhr.status == 200) {
-                            console.log(xhr.responseText);
-                        }
-                        xhr.send(params);
-                    }
-                }
-            </script>
-
         <tr>
             <td></td>
             <td><div><a class="action" href="{{ url_for('item', id=item.Item.id) }}">{{ item.Item.name }}</a></div></td>
-            <td><button onclick='buttonClick({{ item.Item.id|tojson }})'>+</button>
-                <input type="text" id="inc" value={{ item.Cart.cart_quantity }} /><br>
+            <td><p>
+                <button onclick='change({{ item.Cart.cart_quantity|tojson }}, {{ item.Item.id|tojson }}, 0)'>-</button>
+                {{ item.Cart.cart_quantity }}
+                <button onclick='change({{ item.Cart.cart_quantity|tojson }}, {{ item.Item.id|tojson }}, 1)'>+</button></p>
                 <a class="action" href="{{ url_for('delete_from_cart', item_id=item.Item.id) }}">Delete</a>
             </td>
             <td id="price">$
@@ -49,8 +33,7 @@
             <td></td>
             <td>$
                 <script type="text/javascript">
-                    var StringValue = parseFloat({{ price }});
-                    document.write(StringValue.toFixed( 2 ));
+                    formatPrice({{ price }})
                 </script>
             </td>
         </tr>

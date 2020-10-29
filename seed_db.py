@@ -19,10 +19,10 @@ def seed_db():
     db.session.add(user4)
     db.session.commit()
 
-    seller1 = Seller(username='test3', email='test3@example.com', balance=0)
+    seller1 = Seller(username='test3', email='test3@example.com', balance=2000)
     seller1.set_password('123')
     db.session.add(seller1)
-    seller2 = Seller(username='test5', email='test5@example.com', balance=0)
+    seller2 = Seller(username='test5', email='test5@example.com', balance=2000)
     seller2.set_password('345')
     db.session.add(seller2)
     db.session.commit()

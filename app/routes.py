@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, url_for, flash, request
+from flask import Flask, render_template, redirect, url_for, flash, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from app import app
 from app import db
@@ -138,8 +138,15 @@ def cart():
             db.session.commit()
 
     price = total_price(cart_items)
-
+    checkout_status = False
     if 'checkout' in request.form:
+        for i in cart_items:
+            if i.Item.quantity < i.Cart.cart_quantity:  # not enough anymore
+                flash("Item {} no longer in stock in the quantity desired. Your cart quantity was changed to 0".format(
+                    i.Item.name))
+                i.Cart.cart_quantity = 0
+                db.session.commit()
+
         return checkout(current_user.id)
 
     return render_template('cart.html', cart=cart_items, price=price)
@@ -147,9 +154,17 @@ def cart():
 
 @app.route('/edit_cart_quantity', methods=['GET', 'POST'])
 def edit_cart_quantity():
-    jsdata = request.json()
-    print(jsdata)
-    return redirect(url_for('cart'))
+    in_data = request.get_json()
+    new_quantity = in_data["quantity"]
+    item_id = in_data["item_id"]
+    c_item = Cart.query.filter_by(item_id=item_id, buyer_id=current_user.id).first()
+    item_in_db = Item.query.filter_by(id=item_id).first()
+    if new_quantity > item_in_db.quantity:
+        flash("Cannot add more than {} to cart for Item {}".format(item_in_db.quantity, item_in_db.name))
+        return jsonify(False)
+    c_item.cart_quantity = new_quantity
+    db.session.commit()
+    return jsonify(True)
 
 
 def get_user(user_id):
@@ -171,11 +186,14 @@ def checkout(user_id):
     logging.info("In the process of checkout")
     # checkout_date = datetime.strftime(datetime.now(), "%m-%d-%Y, %H:%M:%S")
     checkout_date = datetime.now()
+    items_checked_out = []
     for cart_item in user_cart:
         # update item quantity
         db_item = get_item(cart_item.item_id)
         seller = get_user(db_item.merchant_id)
         new_quantity = db_item.quantity - cart_item.cart_quantity
+        if cart_item.cart_quantity <= 0:
+            continue
         if new_quantity < 0:
             flash("Item {} no longer available in this quantity. Not included in final checkout".format(db_item.name))
             continue
@@ -185,6 +203,7 @@ def checkout(user_id):
         current_user.balance -= (db_item.price*cart_item.cart_quantity)
         seller.balance += (db_item.price*cart_item.cart_quantity)
         db_item.quantity = new_quantity
+        items_checked_out.append(db_item.name)
         db.session.commit()
 
         # checkout
@@ -198,6 +217,10 @@ def checkout(user_id):
         db.session.delete(cart_item)
         db.session.add(oh)
         db.session.commit()
+    if 0 < len(items_checked_out) < 5:
+        flash("Successfully purchased {}".format(str(items_checked_out)[1:-1]))
+    elif len(items_checked_out) > 5:
+        flash("Successfully purchased items. Check Order History for more detail")
     return redirect(url_for("cart"))
 
 
