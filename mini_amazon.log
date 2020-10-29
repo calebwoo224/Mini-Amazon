@@ -1,8 +1,48 @@
-INFO:werkzeug:76.204.57.157 - - [26/Oct/2020 16:16:52] "GET /index HTTP/1.1" 200 -
-INFO:werkzeug:76.204.57.157 - - [26/Oct/2020 16:17:10] "GET /seller_summary HTTP/1.1" 200 -
-INFO:werkzeug:76.204.57.157 - - [26/Oct/2020 16:17:11] "GET /add_item HTTP/1.1" 200 -
-INFO:werkzeug:76.204.57.157 - - [26/Oct/2020 16:17:18] "POST /add_item HTTP/1.1" 302 -
-INFO:werkzeug:76.204.57.157 - - [26/Oct/2020 16:17:18] "GET /index HTTP/1.1" 200 -
-INFO:werkzeug:76.204.57.157 - - [26/Oct/2020 16:17:19] "GET /6/item HTTP/1.1" 200 -
-INFO:werkzeug:76.204.57.157 - - [26/Oct/2020 16:17:22] "GET /logout HTTP/1.1" 302 -
-INFO:werkzeug:76.204.57.157 - - [26/Oct/2020 16:17:22] "GET /index HTTP/1.1" 200 -
+INFO:werkzeug: * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
+INFO:werkzeug:127.0.0.1 - - [29/Oct/2020 16:02:33] "GET / HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [29/Oct/2020 16:02:34] "GET /1/item HTTP/1.1" 200 -
+INFO:root:User (id: 1, username: test) added review for Item (id: 1, name: pens) on 10/29/2020
+INFO:werkzeug:127.0.0.1 - - [29/Oct/2020 16:02:41] "POST /1/item HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [29/Oct/2020 16:03:00] "GET /index HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [29/Oct/2020 16:03:01] "GET /2/item HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [29/Oct/2020 16:03:02] "GET /index HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [29/Oct/2020 16:03:03] "GET /3/item HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [29/Oct/2020 16:03:04] "GET /index HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [29/Oct/2020 16:03:05] "GET /3/item HTTP/1.1" 200 -
+INFO:root:User (id: 1, username: test) added review for Item (id: 3, name: Sprite) on 10/29/2020
+INFO:werkzeug:127.0.0.1 - - [29/Oct/2020 16:03:20] "POST /3/item HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [29/Oct/2020 16:03:23] "GET /index HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [29/Oct/2020 16:03:24] "GET /2/item HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [29/Oct/2020 16:03:25] "GET /index HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [29/Oct/2020 16:03:26] "GET /2/item HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [29/Oct/2020 16:03:27] "GET /index HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [29/Oct/2020 16:03:28] "GET /1/item HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [29/Oct/2020 16:03:30] "GET /index HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [29/Oct/2020 16:03:35] "GET /5/item HTTP/1.1" 200 -
+INFO:root:User (id: 1, username: test) added review for Item (id: 5, name: Tachyons) on 10/29/2020
+INFO:werkzeug:127.0.0.1 - - [29/Oct/2020 16:03:49] "POST /5/item HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [29/Oct/2020 16:03:52] "GET /index HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [29/Oct/2020 16:03:53] "GET /1/item HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [29/Oct/2020 16:03:55] "GET /index HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [29/Oct/2020 16:03:56] "GET /2/item HTTP/1.1" 200 -
+INFO:root:User (id: 1, username: test) added review for Item (id: 2, name: books) on 10/29/2020
+INFO:werkzeug:127.0.0.1 - - [29/Oct/2020 16:04:09] "POST /2/item HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [29/Oct/2020 16:04:11] "GET /index HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [29/Oct/2020 16:04:12] "GET /1/item HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [29/Oct/2020 16:04:13] "GET /index HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [29/Oct/2020 16:04:14] "GET /3/item HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [29/Oct/2020 16:04:15] "GET /index HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [29/Oct/2020 16:04:16] "GET /4/item HTTP/1.1" 200 -
+INFO:root:User (id: 1, username: test) added review for Item (id: 4, name: RTX 3090) on 10/29/2020
+INFO:werkzeug:127.0.0.1 - - [29/Oct/2020 16:04:25] "POST /4/item HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [29/Oct/2020 16:04:26] "GET /index HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [29/Oct/2020 16:04:27] "GET /3/item HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [29/Oct/2020 16:04:28] "GET /index HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [29/Oct/2020 16:04:30] "GET /5/item HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [29/Oct/2020 16:04:31] "GET /index HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [29/Oct/2020 16:04:32] "GET /6/item HTTP/1.1" 200 -
+INFO:root:User (id: 1, username: test) added review for Item (id: 6, name: Pencil) on 10/29/2020
+INFO:werkzeug:127.0.0.1 - - [29/Oct/2020 16:04:42] "POST /6/item HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [29/Oct/2020 16:04:43] "GET /index HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [29/Oct/2020 16:04:45] "GET /1/item HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [29/Oct/2020 16:04:46] "GET /index HTTP/1.1" 200 -
