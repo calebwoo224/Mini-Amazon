@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>{{ current_user.username }}'s Items For Sale</h1>
+    <table>
+        <tr>
+            <th>Item</th>
+            <th>Price</th>
+            <th>Quantity</th>
+        </tr>
+        {% for item in items %}
+        <tr>
+            <td><div><a class="action" href="{{ url_for('item', id=item.id) }}">{{ item.name }}</a></div></td>
+            <td>${{ item.price }}</td>
+            <td>{{ item.quantity }}</td>
+        </tr>
+        {% endfor %}
+        <tr>
+            <td></td>
+            <td></td>
+        </tr>
+    </table>
+
+
+
+{% endblock %}
