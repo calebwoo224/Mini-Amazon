@@ -1,8 +1,0 @@
-INFO:werkzeug:76.204.57.157 - - [26/Oct/2020 16:16:52] "GET /index HTTP/1.1" 200 -
-INFO:werkzeug:76.204.57.157 - - [26/Oct/2020 16:17:10] "GET /seller_summary HTTP/1.1" 200 -
-INFO:werkzeug:76.204.57.157 - - [26/Oct/2020 16:17:11] "GET /add_item HTTP/1.1" 200 -
-INFO:werkzeug:76.204.57.157 - - [26/Oct/2020 16:17:18] "POST /add_item HTTP/1.1" 302 -
-INFO:werkzeug:76.204.57.157 - - [26/Oct/2020 16:17:18] "GET /index HTTP/1.1" 200 -
-INFO:werkzeug:76.204.57.157 - - [26/Oct/2020 16:17:19] "GET /6/item HTTP/1.1" 200 -
-INFO:werkzeug:76.204.57.157 - - [26/Oct/2020 16:17:22] "GET /logout HTTP/1.1" 302 -
-INFO:werkzeug:76.204.57.157 - - [26/Oct/2020 16:17:22] "GET /index HTTP/1.1" 200 -

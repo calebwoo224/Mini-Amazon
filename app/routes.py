@@ -74,7 +74,7 @@ def item(id):
         logging.info("User (id: {}, username: {}) added review for Item (id: {}, name: {}) on {}".format(current_user.id, current_user.username, item.id, item.name, date))
     all_reviews = db.session.query(Reviews, User, Item).join(User,
                                                    (Reviews.user_id == User.id)).join(Item,
-                                                   (Reviews.item_id == id)).all()
+                                                   (Reviews.item_id == Item.id)).filter(Reviews.item_id==id).all()
     return render_template('item.html', item=item, form=form, review_form=review_form, reviews=all_reviews)
 
 
@@ -301,19 +301,19 @@ def seller_reviews():
 def add_seller_review(id):
     seller = Seller.query.filter_by(seller_id=id).first()
     form = AddSellerReviewForm()
-    if form.validate_on_submit():
+    if 'review' in request.form:
         date = '' + str(datetime.now().month) + '/' + str(datetime.now().day) + '/' + str(datetime.now().year)
-        add_review(seller.seller_id, seller.username, date, form.location.data, form.stars.data, form.content.data)
+        add_s_review(seller.seller_id, seller.username, date, form.location.data, form.stars.data, form.content.data)
         logging.info("User (id: {}, username: {}) added review for "
                      "Seller (id: {}, username: {}) on {}".format(current_user.id, current_user.username,
                                                                   seller.seller_id, seller.username, date))
     all_reviews = db.session.query(SellerReviews, User, Seller).join(User,
                                                    (SellerReviews.user_id == User.id)).join(Seller,
-                                                   (SellerReviews.seller_id == id)).all()
+                                                   (SellerReviews.seller_id == Seller.id)).filter(SellerReviews.seller_id==id).all()
     return render_template('add_seller_review.html', seller=seller, form=form, reviews=all_reviews)
 
 
-def add_review(id, name, date, location, stars, content):
+def add_s_review(id, name, date, location, stars, content):
     review = SellerReviews(user_id=current_user.id, seller_id=id, date_time=date,
                            location=location, stars=stars, content=content)
     db.session.add(review)
