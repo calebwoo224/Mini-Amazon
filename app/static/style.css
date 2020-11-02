@@ -1,0 +1,99 @@
+html { font-family: sans-serif; background: #eee; }
+body { margin: 0 auto; background: white; }
+h1 { font-family: serif; color: #000000	; margin: 1rem 0; }
+nav { background: lightgray; display: flex; align-items: center; padding: 0 0.5rem; }
+nav h1 { flex: auto; margin: 0; }
+nav h1 a { text-decoration: none; padding: 0.25rem 0.5rem; }
+nav ul { list-style-type: none; margin: 0; padding: 0; overflow: hidden;}
+nav li { float: left;}
+nav ul li a, .dropbtn {
+  display: inline-block;
+  color: #000000;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+}
+nav ul li a:hover, .dropdown:hover .dropbtn {
+  color: white;
+  background-color: darkblue;
+}
+li.dropdown {
+  display: inline-block;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #f9f9f9;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+    right: 0;
+}
+
+.dropdown-content a {
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+  text-align: left;
+}
+
+.dropdown-content a:hover {color: white; background-color: darkblue;}
+
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+
+.purchases_table {
+    table-layout: fixed;
+    font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.purchases_table td, .purchases_table th {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+.purchases_table tr:nth-child(even){background-color: #f2f2f2;}
+
+.purchases_table tr:hover {background-color: #ddd;}
+
+.purchases_table th {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  text-align: left;
+  background-color: darkblue;
+  color: white;
+}
+
+.purchases_table tr td a, .purchases_table tr td a:visited {color: blue;}
+
+
+.checkout, .checkout a {
+    font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+    background-color: lightgray;
+    border: 2px darkblue;
+    color: black;
+    padding: 10px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 6px 4px;
+    cursor: pointer;
+    border-radius: 8px;
+}
+
+.checkout:hover, .checkout:active {
+    font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+    background-color: darkblue;
+    color: white;
+}
+
+.flash { margin: 1em 0; padding: 1em; background: #cae6f6; border: 1px solid #377ba8; }
+.content form { margin: 1em 0; display: flex; flex-direction: column; }
+.content { padding: 0 1rem 1rem; }
+input[type=submit] { align-self: start; min-width: 10em; }

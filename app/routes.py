@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, url_for, flash, request
+from flask import Flask, render_template, redirect, url_for, flash, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from app import app
 from app import db
@@ -74,17 +74,23 @@ def item(id):
         logging.info("User (id: {}, username: {}) added review for Item (id: {}, name: {}) on {}".format(current_user.id, current_user.username, item.id, item.name, date))
     all_reviews = db.session.query(Reviews, User, Item).join(User,
                                                    (Reviews.user_id == User.id)).join(Item,
-                                                   (Reviews.item_id == id)).all()
+                                                   (Reviews.item_id == Item.id)).filter(Reviews.item_id==id).all()
     return render_template('item.html', item=item, form=form, review_form=review_form, reviews=all_reviews)
 
 
 def update_cart(item, form):
     quantity = item.quantity
-    form.item_quantity.choices = [num for num in range(1, quantity+1)]
+    if quantity == 0:
+        form.item_quantity.choices = [0]
+    else:
+        form.item_quantity.choices = [num for num in range(1, quantity+1)]
 
 
 def add_to_cart(id, quantity):
     quantity = int(quantity)
+    if quantity == 0:
+        flash("Item out of stock. Cannot add to cart")
+        return redirect(url_for('item', id=id))
     if Cart.query.filter_by(item_id=id, buyer_id=current_user.id).first() is not None:  # item already in cart
         cart = Cart.query.get((current_user.id, id))
         item = get_item(cart.item_id)
@@ -132,14 +138,33 @@ def cart():
             db.session.commit()
 
     price = total_price(cart_items)
+    checkout_status = False
+    if 'checkout' in request.form:
+        for i in cart_items:
+            if i.Item.quantity < i.Cart.cart_quantity:  # not enough anymore
+                flash("Item {} no longer in stock in the quantity desired. Your cart quantity was changed to 0".format(
+                    i.Item.name))
+                i.Cart.cart_quantity = 0
+                db.session.commit()
+
+        return checkout(current_user.id)
+
     return render_template('cart.html', cart=cart_items, price=price)
 
 
 @app.route('/edit_cart_quantity', methods=['GET', 'POST'])
 def edit_cart_quantity():
-    jsdata = request.json()
-    print(jsdata)
-    return redirect(url_for('cart'))
+    in_data = request.get_json()
+    new_quantity = in_data["quantity"]
+    item_id = in_data["item_id"]
+    c_item = Cart.query.filter_by(item_id=item_id, buyer_id=current_user.id).first()
+    item_in_db = Item.query.filter_by(id=item_id).first()
+    if new_quantity > item_in_db.quantity:
+        flash("Cannot add more than {} to cart for Item {}".format(item_in_db.quantity, item_in_db.name))
+        return jsonify(False)
+    c_item.cart_quantity = new_quantity
+    db.session.commit()
+    return jsonify(True)
 
 
 def get_user(user_id):
@@ -147,7 +172,7 @@ def get_user(user_id):
     return user
 
 
-@app.route('/<user_id>/checkout', methods=['GET', "POST"])
+# @app.route('/<user_id>/checkout', methods=['GET', "POST"])
 def checkout(user_id):
     cart_items = db.session.query(Cart, Item).join(Item,
                                                    (Cart.item_id == Item.id)).filter(Cart.buyer_id ==
@@ -161,11 +186,14 @@ def checkout(user_id):
     logging.info("In the process of checkout")
     # checkout_date = datetime.strftime(datetime.now(), "%m-%d-%Y, %H:%M:%S")
     checkout_date = datetime.now()
+    items_checked_out = []
     for cart_item in user_cart:
         # update item quantity
         db_item = get_item(cart_item.item_id)
         seller = get_user(db_item.merchant_id)
         new_quantity = db_item.quantity - cart_item.cart_quantity
+        if cart_item.cart_quantity <= 0:
+            continue
         if new_quantity < 0:
             flash("Item {} no longer available in this quantity. Not included in final checkout".format(db_item.name))
             continue
@@ -175,6 +203,7 @@ def checkout(user_id):
         current_user.balance -= (db_item.price*cart_item.cart_quantity)
         seller.balance += (db_item.price*cart_item.cart_quantity)
         db_item.quantity = new_quantity
+        items_checked_out.append(db_item.name)
         db.session.commit()
 
         # checkout
@@ -188,6 +217,10 @@ def checkout(user_id):
         db.session.delete(cart_item)
         db.session.add(oh)
         db.session.commit()
+    if 0 < len(items_checked_out) < 5:
+        flash("Successfully purchased {}".format(str(items_checked_out)[1:-1]))
+    elif len(items_checked_out) > 5:
+        flash("Successfully purchased items. Check Order History for more detail")
     return redirect(url_for("cart"))
 
 
@@ -195,7 +228,7 @@ def total_price(cart_items):
     sum_price = 0
     for i in cart_items:
         sum_price += (i.Item.price * i.Cart.cart_quantity)
-    return sum_price
+    return round(sum_price, 2)
 
 
 def get_cart(user_id):
@@ -206,11 +239,11 @@ def get_cart(user_id):
 
 @app.route('/<user_id>/order_history', methods=['GET', "POST"])
 def order_history(user_id):
-    u_history = db.session.query(OrderHistory,
-                                 Item).join(Item,
-                                            (OrderHistory.item_id
-                                             == Item.id)).filter(OrderHistory.buyer_id
-                                                                 == user_id).order_by(desc(OrderHistory.datetime)).all()
+    u_history = db.session.query(OrderHistory, Item,
+                                 Seller).join(Item, (OrderHistory.item_id ==
+                                                     Item.id)).join(Seller, (OrderHistory.seller_id ==
+                                                                             Seller.id)).filter(OrderHistory.buyer_id ==
+                                                                                                user_id).order_by(desc(OrderHistory.datetime)).all()
     orders = get_orders_by_time(u_history)
     return render_template('order_history.html', history=orders) 
 
@@ -268,19 +301,19 @@ def seller_reviews():
 def add_seller_review(id):
     seller = Seller.query.filter_by(seller_id=id).first()
     form = AddSellerReviewForm()
-    if form.validate_on_submit():
+    if 'review' in request.form:
         date = '' + str(datetime.now().month) + '/' + str(datetime.now().day) + '/' + str(datetime.now().year)
-        add_review(seller.seller_id, seller.username, date, form.location.data, form.stars.data, form.content.data)
+        add_s_review(seller.seller_id, seller.username, date, form.location.data, form.stars.data, form.content.data)
         logging.info("User (id: {}, username: {}) added review for "
                      "Seller (id: {}, username: {}) on {}".format(current_user.id, current_user.username,
                                                                   seller.seller_id, seller.username, date))
     all_reviews = db.session.query(SellerReviews, User, Seller).join(User,
                                                    (SellerReviews.user_id == User.id)).join(Seller,
-                                                   (SellerReviews.seller_id == id)).all()
+                                                   (SellerReviews.seller_id == Seller.id)).filter(SellerReviews.seller_id==id).all()
     return render_template('add_seller_review.html', seller=seller, form=form, reviews=all_reviews)
 
 
-def add_review(id, name, date, location, stars, content):
+def add_s_review(id, name, date, location, stars, content):
     review = SellerReviews(user_id=current_user.id, seller_id=id, date_time=date,
                            location=location, stars=stars, content=content)
     db.session.add(review)

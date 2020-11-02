@@ -3,7 +3,10 @@
 {% block content %}
     <h1>{{ item.name }}</h1>
     <p>
-        Price: ${{ item.price }}<br>
+        Price: $
+        <script type="text/javascript">
+            formatPrice({{ item.price }});
+        </script><br>
         Quantity: {{ item.quantity }}<br>
         Seller: {{ item.seller.username }}<br>
     </p>
@@ -22,7 +25,7 @@
     <h2>Reviews</h2>
     <table>
         <tr>
-            <th>Username</th>
+            <th>Reviewer</th>
             <th>Date</th>
             <th>Location</th>
             <th>Stars</th>

@@ -6,5 +6,8 @@ __pycache__/
 venv/
 316_Amazon/
 .idea/
+mini_amazon.log
+app.db
+app/.DS_Store
 mini_amazon.log/
 app.db/
