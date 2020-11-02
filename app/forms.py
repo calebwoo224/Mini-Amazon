@@ -2,6 +2,8 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, DecimalField, IntegerField, SelectField, TextField
 from wtforms.validators import DataRequired
 from app.models import Item
+from wtforms.ext.sqlalchemy.fields import QuerySelectField
+from app.models import Category
 
 
 class LoginForm(FlaskForm):
@@ -17,6 +19,9 @@ class AddItemForm(FlaskForm):
     price = DecimalField('Item Price', validators=[DataRequired()], places=2)
     quantity = IntegerField('Item Quantity', validators=[DataRequired()])
     description = StringField('Brief Description', validators=[DataRequired()])
+    # ADD IMAGE LATER?
+    category_list = list(Category.query.all())
+    category = SelectField('Category', choices=category_list, default= "Other")
     is_for_sale = BooleanField("Is for sale?", validators=[DataRequired()])
     submit = SubmitField('Add Item')
 
@@ -37,3 +42,9 @@ class AddSellerReviewForm(FlaskForm):
     stars = IntegerField('Stars', validators=[DataRequired()])
     content = TextField('Write your review:', validators=[DataRequired()])
     submit = SubmitField('Add Review')
+
+'''
+class AddCategory(FlaskForm):
+    name = StringField('New Category Name')
+    submit = SubmitField('Create Category')
+'''

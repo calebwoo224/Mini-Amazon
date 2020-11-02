@@ -44,7 +44,7 @@ def add_item():
     form = AddItemForm()
     if form.validate_on_submit():
         item = Item(id = form.id.data, name=form.name.data, price=form.price.data, quantity=form.quantity.data,
-                    description = form.description.data, is_for_sale = form.is_for_sale.data)
+                    category = form.category.data, description = form.description.data, is_for_sale = form.is_for_sale.data)
         db.session.add(item)
         db.session.commit()
         return redirect(url_for('index'))
@@ -232,3 +232,12 @@ def add_review(id, name, date, location, stars, content):
     db.session.commit()
     flash('Successfully added seller review for seller {}'.format(name))
     return redirect(url_for('add_seller_review', id=id))
+
+@app.route('/explore_categories', methods=['GET', 'POST'])
+def explore_categories():
+    categories = Category.query.all()
+    return render_template('categories.html', title='Explore Categories', categories=categories)
+
+def categoryItems(category):
+  items = category.items.all()
+  return items

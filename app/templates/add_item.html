@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-
+<!--ADD IMAGE LATER?-->
 {% block content %}
     <h1>Add Item</h1>
     <form action="" method="post" novalidate>
@@ -29,6 +29,13 @@
             {{ form.quantity.label }}<br>
             {{ form.quantity }}<br>
             {% for error in form.quantity.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.category.label }}<br>
+            {{ form.category }}<br>
+            {% for error in form.category.errors %}
             <span style="color: red;">[{{ error }}]</span>
             {% endfor %}
         </p>

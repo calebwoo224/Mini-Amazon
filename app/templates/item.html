@@ -1,11 +1,14 @@
 {% extends "base.html" %}
-
+<!--ADD IMAGE LATER?-->
 {% block content %}
     <h1>{{ item.name }}</h1>
     <p>
         Price: ${{ item.price }}<br>
         Quantity: {{ item.quantity }}<br>
         Seller: {{ item.seller }}<br>
+        Category: {{ item.category }}<br>
+        Description: {{ item.description }}<br>
+        For Sale?: {{ item.is_for_sale }}<br>
     </p>
 
     <form action="" method="post" novalidate>

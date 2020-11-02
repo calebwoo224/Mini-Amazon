@@ -30,15 +30,15 @@ class User(UserMixin, db.Model):
 def load_user(id):
     return User.query.get(int(id))
 
-'''
+
 class Category(db.Model):
-    category_id = db.Column(db.String(4), nullable = False, primary_key = True)
-    name = db.Column(db.String(45))
+    # category_id = db.Column(db.String(4), nullable = False, primary_key = True)
+    name = db.Column(db.String(45), primary_key=True)
     items = db.relationship('Item', backref='categoryItem')
 
     def __repr__(self):
-       return '<Category {}>'.format(self.name)
-'''
+       return '{}'.format(self.name)
+
 
 
 
@@ -60,9 +60,9 @@ class Item(db.Model):
     price = db.Column(db.Float, nullable=False)
     quantity = db.Column(db.Integer, nullable=False)
     reviews = db.relationship('Reviews', backref='item')
-    # image = ...
+    # image = ...   ADD IMAGE LATER?
     # avg_user_rating = ...
-    # category = db.Column(db.String(45), db.ForeignKey('category.name'))
+    category = db.Column(db.String(45), db.ForeignKey('category.name'))
     description = db.Column(db.String(300))
     is_for_sale =db.Column(db.Boolean, unique=False, default=True)
     merchant_id = db.Column(db.Integer, db.ForeignKey('Seller.id'))

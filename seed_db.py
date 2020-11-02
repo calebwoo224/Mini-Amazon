@@ -1,6 +1,6 @@
 from app import app
 from app import db
-from app.models import User, Item, Reviews, Seller, OrderHistory, SellerReviews
+from app.models import User, Item, Reviews, Seller, OrderHistory, SellerReviews, Category
 
 
 def seed_db():
@@ -30,15 +30,24 @@ def seed_db():
     db.session.add(seller2)
     db.session.commit()   
     
-    item = Item(name='pens', price=3.00, quantity=30, seller=seller1)
+    category=Category(name="Office Supplies")
+    db.session.add(category)
+    category = Category(name="Groceries")
+    db.session.add(category)
+    category = Category(name="Electronics")
+    db.session.add(category)
+    category = Category(name="Other")
+    db.session.add(category)
+    
+    item = Item(name='pens', price=3.00, quantity=30, seller=seller1, category="Office Supplies")
     db.session.add(item)
-    item2 = Item(name='books', price=0.90, quantity=400, seller = seller2)
+    item2 = Item(name='books', price=0.90, quantity=400, seller = seller2, category ="Office Supplies")
     db.session.add(item2)
-    item3 = Item(name='Sprite', price=18.50, quantity=13, seller = seller2)
+    item3 = Item(name='Sprite', price=18.50, quantity=13, seller = seller2, category="Groceries")
     db.session.add(item3)
-    item4 = Item(name='RTX 3090', price=32.99, quantity=3, seller = seller1)
+    item4 = Item(name='RTX 3090', price=32.99, quantity=3, seller = seller1, category="Electronics")
     db.session.add(item4)
-    item5 = Item(name='Tachyons', price=45.00, quantity=211, seller = seller1)
+    item5 = Item(name='Tachyons', price=45.00, quantity=211, seller = seller1, category="Other")
     db.session.add(item5)
 
 
