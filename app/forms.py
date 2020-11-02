@@ -43,7 +43,7 @@ class AddSellerReviewForm(FlaskForm):
     content = TextField('Write your review:', validators=[DataRequired()])
     submit = SubmitField('Add Review')
 
-'''
+''' No need for this...
 class AddCategory(FlaskForm):
     name = StringField('New Category Name')
     submit = SubmitField('Create Category')

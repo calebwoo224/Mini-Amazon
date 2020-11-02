@@ -5,7 +5,7 @@ from app import db
 from app.forms import LoginForm, AddItemForm, AddtoCart, AddReviewForm, AddSellerReviewForm
 from flask_login import current_user, login_user, logout_user, login_required
 import logging
-from app.models import User, Item, Cart, Reviews, OrderHistory, Seller, SellerReviews
+from app.models import User, Item, Cart, Reviews, OrderHistory, Seller, SellerReviews, Category
 from datetime import datetime
 from sqlalchemy import desc
 
@@ -236,8 +236,16 @@ def add_review(id, name, date, location, stars, content):
 @app.route('/explore_categories', methods=['GET', 'POST'])
 def explore_categories():
     categories = Category.query.all()
-    return render_template('categories.html', title='Explore Categories', categories=categories)
+    return render_template('explore_categories.html', title='Explore Categories', categories=categories)
 
-def categoryItems(category):
-  items = category.items.all()
-  return items
+
+
+@app.route('/category/<name>', methods=['GET', 'POST'])
+def category(category):
+  items = categoryItems(category.name)
+  return render_template("category.html", title='<name>',items = items)
+
+def categoryItems(cat):
+  # items = category.items.all()
+  query = Items.query.filter_by(category = cat).all()
+  return query
