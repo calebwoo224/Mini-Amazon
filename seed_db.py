@@ -17,7 +17,7 @@ def user_init(dic):
         user.set_password(str(dic['password'][key]))
         db.session.add(user)
 
-<<<<<<< HEAD
+
 def seller_init(dic):   
     for key in dic['username']:
         seller = Seller(username= dic['username'][key], email=dic['email'][key])
@@ -35,17 +35,9 @@ def item_init(dic):
             db.session.add(toAdd)
         item = Item(name=dic['name'][key], price=dic['price'][key], quantity=dic['quantity'][key], seller=Seller.query.filter_by(username = dic['merchant_id'][key]).first())
         db.session.add(item)
-    
-=======
-    seller1 = Seller(username='test3', email='test3@example.com', balance=2000)
-    seller1.set_password('123')
-    db.session.add(seller1)
-    seller2 = Seller(username='test5', email='test5@example.com', balance=2000)
-    seller2.set_password('345')
-    db.session.add(seller2)
     db.session.commit()
->>>>>>> 32c7f3c429c4f4eb554efc431080ba41e0c038a2
-    
+
+
 def seed_db():
 
     db.drop_all()
@@ -60,3 +52,4 @@ def seed_db():
 
 if __name__ == '__main__':
     seed_db()
+
