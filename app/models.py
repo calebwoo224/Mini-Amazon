@@ -52,7 +52,9 @@ class Item(db.Model):
     # avg_user_rating = ...
     category = db.Column(db.String(45), db.ForeignKey('category.name'))
     description = db.Column(db.String(300))
+    is_for_sale = db.Column(db.Boolean, unique=False, default=True)
     merchant_id = db.Column(db.Integer, db.ForeignKey('Seller.id'))
+
 
     def __repr__(self):
         return '<Item {}>'.format(self.name)

@@ -43,7 +43,7 @@ def logout():
 def add_item():
     form = AddItemForm()
     if form.validate_on_submit():
-        item = Item(id = form.id.data, name=form.name.data, price=form.price.data, quantity=form.quantity.data,
+        item = Item(name=form.name.data, price=form.price.data, quantity=form.quantity.data,
                     category = form.category.data, description = form.description.data, is_for_sale = form.is_for_sale.data)
         db.session.add(item)
         db.session.commit()
@@ -241,11 +241,11 @@ def explore_categories():
 
 
 @app.route('/category/<name>', methods=['GET', 'POST'])
-def category(category):
-  items = categoryItems(category.name)
-  return render_template("category.html", title='<name>',items = items)
+def category(name):
+  items = categoryItems(name)
+  return render_template("category.html", title=name,items = items)
 
 def categoryItems(cat):
   # items = category.items.all()
-  query = Items.query.filter_by(category = cat).all()
+  query = Item.query.filter_by(category = cat).all()
   return query

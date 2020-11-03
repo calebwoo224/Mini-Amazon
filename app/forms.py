@@ -14,7 +14,6 @@ class LoginForm(FlaskForm):
 
 
 class AddItemForm(FlaskForm):
-    id = IntegerField('ID Number', validators=[DataRequired()])
     name = StringField('Item Name', validators=[DataRequired()])
     price = DecimalField('Item Price', validators=[DataRequired()], places=2)
     quantity = IntegerField('Item Quantity', validators=[DataRequired()])
