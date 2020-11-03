@@ -5,7 +5,7 @@ from app import db
 from app.forms import LoginForm, AddItemForm, AddtoCart, AddReviewForm, AddSellerReviewForm
 from flask_login import current_user, login_user, logout_user, login_required
 import logging
-from app.models import User, Item, Cart, Reviews, OrderHistory, Seller, SellerReviews
+from app.models import User, Item, Cart, Reviews, OrderHistory, Seller, SellerReviews, Category
 from datetime import datetime
 from sqlalchemy import desc
 
@@ -43,7 +43,8 @@ def logout():
 def add_item():
     form = AddItemForm()
     if form.validate_on_submit():
-        item = Item(name=form.name.data, price=form.price.data, quantity=form.quantity.data, seller = current_user)
+        item = Item(name=form.name.data, price=form.price.data, quantity=form.quantity.data, seller = current_user,
+                    category = form.category.data, description = form.description.data, is_for_sale = form.is_for_sale.data)
         db.session.add(item)
         db.session.commit()
         return redirect(url_for('index'))
@@ -321,7 +322,25 @@ def add_s_review(id, name, date, location, stars, content):
     flash('Successfully added seller review for seller {}'.format(name))
     return redirect(url_for('add_seller_review', id=id))
 
+
 @app.route('/profile', methods=['GET', 'POST'])
 def profile():
     u=User.query.filter_by(id=current_user.id).first()
 
+
+@app.route('/explore_categories', methods=['GET', 'POST'])
+def explore_categories():
+    categories = Category.query.all()
+    return render_template('explore_categories.html', title='Explore Categories', categories=categories)
+
+
+
+@app.route('/category/<name>', methods=['GET', 'POST'])
+def category(name):
+  items = categoryItems(name)
+  return render_template("category.html", title=name,items = items)
+
+def categoryItems(cat):
+  # items = category.items.all()
+  query = Item.query.filter_by(category = cat).all()
+  return query
