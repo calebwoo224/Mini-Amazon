@@ -9,3 +9,4 @@ Werkzeug==0.16.0
 flask_login
 flask_sqlalchemy
 flask_wtf
+pandas

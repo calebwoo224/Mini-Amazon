@@ -58,6 +58,7 @@ class Item(db.Model):
     description = db.Column(db.String(300), default="No description available")
     is_for_sale = db.Column(db.Boolean, default=True)
     merchant_id = db.Column(db.Integer, db.ForeignKey('Seller.id'))
+    description = db.Column(db.String(200))
 
 
     def __repr__(self):

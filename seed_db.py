@@ -3,7 +3,6 @@ from app import db
 import pandas as pd
 from app.models import User, Item, Reviews, Seller, OrderHistory, SellerReviews, Category
 
-
 def Load_Data(file_name):
     df = pd.read_csv(file_name)
     dic = df.to_dict()
@@ -33,7 +32,8 @@ def item_init(dic):
             i += 1
             toAdd.set_password('123')
             db.session.add(toAdd)
-        item = Item(name=dic['name'][key], price=dic['price'][key], quantity=dic['quantity'][key],
+        item = Item(name=dic['name'][key], price=dic['price'][key],
+                    quantity=dic['quantity'][key], description=dic['description'][key],
                     seller=Seller.query.filter_by(username=dic['merchant_id'][key]).first())
         db.session.add(item)
     db.session.commit()

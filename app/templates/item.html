@@ -1,73 +1,86 @@
 {% extends "base.html" %}
-<!--ADD IMAGE LATER?-->
-{% block content %}
-    <h1>{{ item.name }}</h1>
-    <p>
-        Price: $
-        <script type="text/javascript">
-            formatPrice({{ item.price }});
-        </script><br>
-        Quantity: {{ item.quantity }}<br>
-        Seller: {{ item.seller.username }}<br>
-        Category: {{ item.category }}<br>
-        Description: {{ item.description }}<br>
-        For Sale?: {{ item.is_for_sale }}<br>
-    </p>
 
-    <form action="" method="post" novalidate>
-        {{ form.hidden_tag() }}
+{% block title %}{{ item.name }}{% endblock %}
+{% block content %}
+    <div class="grid-container">
+    <div class="item">
+        <h1>{{ item.name }}</h1>
+<!--ADD IMAGE LATER?-->
         <p>
-            {{ form.item_quantity.label }}<br>
-            {{ form.item_quantity }}<br>
-            {% for error in form.item_quantity.errors %}
-            <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
+            Price: $
+            <script type="text/javascript">
+                formatPrice({{ item.price }});
+            </script><br>
+            Quantity: {{ item.quantity }}<br>
+            Seller: {{ item.seller.username }}<br>
+            Category: {{ item.category }}<br>
+            For Sale?: {{ item.is_for_sale }}<br>
+            <p>
+                Description:<br>
+                <p>{{ item.description }}</p><br>
+            </p>
         </p>
-        <input type='submit' name='cart' value='Add to cart'>
-    </form>
-    <h2>Reviews</h2>
-    <table>
-        <tr>
-            <th>Reviewer</th>
-            <th>Date</th>
-            <th>Location</th>
-            <th>Stars</th>
-            <th>Content</th>
-        </tr>
-        {% for review in reviews %}
-        <tr>
-            <td>{{ review.User.username }}</td>
-            <td>{{ review.Reviews.date_time }}</td>
-            <td>{{ review.Reviews.location }}</td>
-            <td>{{ review.Reviews.stars }}</td>
-            <td>{{ review.Reviews.content }}</td>
-        </tr>
-        {% endfor %}
-    </table>
-    <h2>Write a review</h2>
-    <form action="" method="post" novalidate>
-        {{ review_form.hidden_tag() }}
-        <p>
-            {{ review_form.location.label }}<br>
-            {{ review_form.location(size=32) }}<br>
-            {% for error in review_form.location.errors %}
-            <span style="color: red;">[{{ error }}]</span>
+    </div>
+    <div class="addtocart">
+        <h2>Add to Cart</h2>
+        <form action="" method="post" novalidate>
+            {{ form.hidden_tag() }}
+            <p>
+                {{ form.item_quantity.label }}<br>
+                {{ form.item_quantity }}<br>
+                {% for error in form.item_quantity.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+                {% endfor %}
+            </p>
+            <input type='submit' name='cart' value='Add to cart'>
+        </form>
+    </div>
+    <div class="reviews">
+        <h2>Reviews</h2>
+        <table>
+            <tr>
+                <th>Reviewer</th>
+                <th>Date</th>
+                <th>Location</th>
+                <th>Stars</th>
+                <th>Content</th>
+            </tr>
+            {% for review in reviews %}
+            <tr>
+                <td>{{ review.User.username }}</td>
+                <td>{{ review.Reviews.date_time }}</td>
+                <td>{{ review.Reviews.location }}</td>
+                <td>{{ review.Reviews.stars }}</td>
+                <td>{{ review.Reviews.content }}</td>
+            </tr>
             {% endfor %}
-        </p>
-        <p>
-            {{ review_form.stars.label }}<br>
-            {{ review_form.stars(size=32) }}<br>
-            {% for error in review_form.stars.errors %}
-            <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
-        </p>
-        <p>
-            {{ review_form.content.label }}<br>
-            {{ review_form.content(size=32) }}<br>
-            {% for error in review_form.content.errors %}
-            <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
-        </p>
-        <input type='submit' name='review' value='Add review'>
-    </form>
+        </table>
+        <h2>Write a review</h2>
+        <form action="" method="post" novalidate>
+            {{ review_form.hidden_tag() }}
+            <p>
+                {{ review_form.location.label }}<br>
+                {{ review_form.location(size=32) }}<br>
+                {% for error in review_form.location.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+                {% endfor %}
+            </p>
+            <p>
+                {{ review_form.stars.label }}<br>
+                {{ review_form.stars(size=32) }}<br>
+                {% for error in review_form.stars.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+                {% endfor %}
+            </p>
+            <p>
+                {{ review_form.content.label }}<br>
+                {{ review_form.content(size=32) }}<br>
+                {% for error in review_form.content.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+                {% endfor %}
+            </p>
+            <input type='submit' name='review' value='Add review'>
+        </form>
+    </div>
+    </div>
 {% endblock %}

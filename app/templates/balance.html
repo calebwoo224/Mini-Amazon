@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Balance{% endblock %}
+{% block content %}
+
+    <div class="center">
+    <h1>Balance</h1>
+    <p>Your current balance: $
+        <script type="text/javascript">
+            formatPrice({{ balance }})
+        </script></p>
+    <form action="" method="post" novalidate>
+        {{ form.hidden_tag() }}
+        <h3>Add to Balance</h3>
+        <p>
+            {{ form.newbalance.label }}: ${{ form.newbalance }}<br>
+        </p>
+        <input type='submit' name='balance' value='Add Balance'>
+    </form>
+    </div>
+{% endblock %}

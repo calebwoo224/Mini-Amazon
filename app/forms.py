@@ -53,7 +53,7 @@ class AddItemForm(FlaskForm):
 
 
 class AddtoCart(FlaskForm):
-    item_quantity = SelectField(u'quantity')
+    item_quantity = SelectField(u'Quantity')
     # submit = SubmitField('Add to Cart')
 
 
@@ -61,10 +61,14 @@ class AddReviewForm(FlaskForm):
     location = StringField('Location')
     stars = IntegerField('Stars', validators=[DataRequired()])
     content = TextField('Write your review:', validators=[DataRequired()])
-    # submit = SubmitField('Add Review')
+
 
 class AddSellerReviewForm(FlaskForm):
     location = StringField('Location')
     stars = IntegerField('Stars', validators=[DataRequired()])
     content = TextField('Write your review:', validators=[DataRequired()])
-    # submit = SubmitField('Add Review')
+
+
+class EditBalance(FlaskForm):
+    newbalance = DecimalField('Amount', validators=[DataRequired()], places=2)
+
