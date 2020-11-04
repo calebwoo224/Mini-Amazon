@@ -18,6 +18,7 @@
                 <a href="javascript:void(0)" class="dropbtn">{{ current_user.username }}</a>
                 <div class="dropdown-content">
                     <a href="{{ url_for('order_history', user_id=current_user.id) }}">Order History</a>
+                    <a href="{{ url_for('balance') }}">Balance</a>
                     {% if current_user.seller_id%}
                         <a href="{{ url_for('seller_summary') }}">Seller Summary</a>
                         <a href="{{ url_for('trade_history', seller_id=current_user.id) }}">Trade History</a>

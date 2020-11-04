@@ -2,7 +2,7 @@ from flask import Flask, render_template, redirect, url_for, flash, request, jso
 from flask_sqlalchemy import SQLAlchemy
 from app import app
 from app import db
-from app.forms import LoginForm, AddItemForm, AddtoCart, AddReviewForm, AddSellerReviewForm
+from app.forms import LoginForm, AddItemForm, AddtoCart, AddReviewForm, AddSellerReviewForm, EditBalance
 from flask_login import current_user, login_user, logout_user, login_required
 import logging
 from app.models import User, Item, Cart, Reviews, OrderHistory, Seller, SellerReviews
@@ -83,7 +83,10 @@ def update_cart(item, form):
     if quantity == 0:
         form.item_quantity.choices = [0]
     else:
-        form.item_quantity.choices = [num for num in range(1, quantity+1)]
+        if quantity > 20:
+            form.item_quantity.choices = [num for num in range(1, 21)]
+        else:
+            form.item_quantity.choices = [num for num in range(1, quantity+1)]
 
 
 def add_to_cart(id, quantity):
@@ -104,7 +107,7 @@ def add_to_cart(id, quantity):
         logging.info("User {} added {} to cart".format(current_user.username, item.name))
     db.session.add(cart)
     db.session.commit()
-    flash('Successfully added {} item to cart'.format(quantity))
+    flash('Successfully added {} item(s) to cart'.format(quantity))
     return redirect(url_for('item', id=id))
 
 
@@ -172,13 +175,12 @@ def get_user(user_id):
     return user
 
 
-# @app.route('/<user_id>/checkout', methods=['GET', "POST"])
 def checkout(user_id):
     cart_items = db.session.query(Cart, Item).join(Item,
                                                    (Cart.item_id == Item.id)).filter(Cart.buyer_id ==
                                                                                      current_user.id).all()
     price = total_price(cart_items)
-    if current_user.balance < price:
+    if current_user.balance is None or current_user.balance < price:
         flash("You do not have enough in your balance to complete the transaction. Please update balance or"
               " edit cart.")
         return redirect(url_for('cart'))
@@ -201,6 +203,8 @@ def checkout(user_id):
             flash("Item {} price changed. Your balance is not enough".format(db_item.name))
             continue
         current_user.balance -= (db_item.price*cart_item.cart_quantity)
+        if seller.balance is None:
+            seller.balance = 0
         seller.balance += (db_item.price*cart_item.cart_quantity)
         db_item.quantity = new_quantity
         items_checked_out.append(db_item.name)
@@ -321,7 +325,31 @@ def add_s_review(id, name, date, location, stars, content):
     flash('Successfully added seller review for seller {}'.format(name))
     return redirect(url_for('add_seller_review', id=id))
 
+
 @app.route('/profile', methods=['GET', 'POST'])
 def profile():
-    u=User.query.filter_by(id=current_user.id).first()
+    u = User.query.filter_by(id=current_user.id).first()
 
+
+@app.route('/balance', methods=['GET', 'POST'])
+def balance():
+    u = User.query.filter_by(id=current_user.id).first()
+    if u.balance is None:
+        u.balance = 0
+    current_balance = u.balance
+    form = EditBalance()
+    if 'balance' in request.form:
+        newbalance = form.newbalance.data
+        try:
+            newbalance = float(newbalance)
+        except TypeError:
+            flash("Cannot added a non-numeric value to balance")
+            return redirect(url_for('balance'))
+        if newbalance < 0:
+            flash("Cannot added a negative balance")
+            return redirect(url_for('balance'))
+        u.balance += newbalance
+        db.session.commit()
+        flash("Successfully added ${} to balance".format(round(newbalance, 2)))
+        return redirect(url_for('balance'))
+    return render_template('balance.html', balance=current_balance, form=form)

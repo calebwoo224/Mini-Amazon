@@ -49,6 +49,7 @@ class Item(db.Model):
     quantity = db.Column(db.Integer, nullable=False)
     reviews = db.relationship('Reviews', backref='item')
     merchant_id = db.Column(db.Integer, db.ForeignKey('Seller.id'))
+    description = db.Column(db.String(200))
 
     def __repr__(self):
         return '<Item {}>'.format(self.name)
