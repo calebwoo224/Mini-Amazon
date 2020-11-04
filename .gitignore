@@ -8,3 +8,4 @@ venv/
 .idea/
 mini_amazon.log
 app.db
+env/
