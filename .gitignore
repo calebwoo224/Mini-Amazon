@@ -9,3 +9,5 @@ venv/
 mini_amazon.log
 app.db
 env/
+app/.DS_Store
+mini_amazon.log/

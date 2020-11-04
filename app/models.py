@@ -13,8 +13,8 @@ class User(UserMixin, db.Model):
     reviews = db.relationship('Reviews', backref='user')
     seller_reviews = db.relationship('SellerReviews', backref='user')
     type = db.Column(db.String(50))
+    balance = db.Column(db.Float)
     __mapper_args__ = {'polymorphic_identity': 'user', 'polymorphic_on': type}
-
 
     def __repr__(self):
         return '<User {}>'.format(self.username)
@@ -35,21 +35,15 @@ def load_user(id):
     return User.query.get(int(id))
 
 
-
-
 class Seller(User):
     __tablename__ = 'Seller'
-    __mapper_args__ = {'polymorphic_identity':'seller'}
-    seller_id = db.Column('id', db.Integer, db.ForeignKey('user.id'),primary_key=True)
-    sells = db.relationship('Item', backref = 'seller', lazy = 'dynamic')
+    __mapper_args__ = {'polymorphic_identity': 'seller'}
+    seller_id = db.Column('id', db.Integer, db.ForeignKey('user.id'), primary_key=True)
+    sells = db.relationship('Item', backref='seller', lazy='dynamic')
     seller_reviews = db.relationship('SellerReviews', backref='seller')
+
     def __repr__(self):
         return '<Seller {}>'.format(self.seller_id)
-
-
-
-
-
 
 
 class Item(db.Model):
@@ -58,7 +52,13 @@ class Item(db.Model):
     price = db.Column(db.Float, nullable=False)
     quantity = db.Column(db.Integer, nullable=False)
     reviews = db.relationship('Reviews', backref='item')
+    # image = ...   ADD IMAGE LATER?
+    # avg_user_rating = ...
+    category = db.Column(db.String(45), db.ForeignKey('category.name'))
+    description = db.Column(db.String(300), default="No description available")
+    is_for_sale = db.Column(db.Boolean, default=True)
     merchant_id = db.Column(db.Integer, db.ForeignKey('Seller.id'))
+
 
     def __repr__(self):
         return '<Item {}>'.format(self.name)
@@ -73,6 +73,7 @@ class Cart(db.Model):
 class OrderHistory(db.Model):
     item_id = db.Column(db.Integer, db.ForeignKey('item.id'), primary_key=True)
     buyer_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
+    seller_id = db.Column(db.Integer, db.ForeignKey('Seller.id'), primary_key=True)
     datetime = db.Column(db.DateTime, primary_key=True)
     quantity_sold = db.Column(db.Integer, nullable=False)
     price_sold = db.Column(db.Float, nullable=False)
@@ -86,13 +87,10 @@ class Reviews(db.Model):
     reviews = db.Table('reviews', db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
     db.Column('item_id', db.Integer, db.ForeignKey('item.id'), primary_key=True), db.Column('date_time', db.String(10), nullable=False),
     db.Column('location', db.String(120)), db.Column('stars', db.Integer, nullable=False), db.Column('content', db.Text, primary_key=True))
-    #comment_thread = db.Column(db.String(1000))
+    # comment_thread = db.Column(db.String(1000))
 
     def __repr__(self):
         return '<Reviews ({}, {}, {}, {}, {}, {})>'.format(self.user_id, self.item_id, self.date_time, self.location, self.stars, self.content)
-
-
-
 
 
 # I think add this to User class
@@ -106,7 +104,7 @@ class SellerReviews(db.Model):
     seller_reviews = db.Table('seller_reviews', db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
     db.Column('seller_id', db.Integer, db.ForeignKey('Seller.id'), primary_key=True), db.Column('date_time', db.String(10), nullable=False),
     db.Column('location', db.String(120)), db.Column('stars', db.Integer, nullable=False), db.Column('content', db.Text, primary_key=True))
-    #comment_thread = db.Column(db.String(1000))
+    # comment_thread = db.Column(db.String(1000))
 
     def __repr__(self):
         return '<Seller Reviews ({}, {}, {}, {}, {}, {})>'.format(self.user_id, self.seller_id, self.date_time, self.location, self.stars, self.content)
@@ -116,3 +114,12 @@ class SellerReviews(db.Model):
 
 # I think add this to Seller class
 # seller_reviews = db.relationship('SellerReviews', backref='seller_id')
+
+class Category(db.Model):
+    # category_id needed for clarity in other functions???
+    # category_id = db.Column(db.String(4), nullable = False, primary_key = True)
+    name = db.Column(db.String(45), primary_key = True)
+    items = db.relationship('Item', backref='categoryItem')
+
+    def __repr__(self):
+       return '{}'.format(self.name)

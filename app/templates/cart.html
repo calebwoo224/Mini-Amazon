@@ -1,30 +1,46 @@
 {% extends "base.html" %}
-
+{% block title %}Cart{% endblock %}
 {% block content %}
-    <h1>{{ current_user.username }}'s Cart</h1>
-    <table>
+    <h1>Shopping Cart</h1>
+    <table class="purchases_table">
         <tr>
+            <th></th>
             <th>Item</th>
-            <th>Price</th>
             <th>Quantity</th>
+            <th>Price</th>
         </tr>
         {% for item in cart %}
         <tr>
+            <td></td>
             <td><div><a class="action" href="{{ url_for('item', id=item.Item.id) }}">{{ item.Item.name }}</a></div></td>
-            <td>${{ item.Item.price }}</td>
-            <td>{{ item.Cart.cart_quantity }}</td>
-            <td><a class="action" href="{{ url_for('delete_from_cart', item_id=item.Item.id) }}">Delete</a></td>
+            <td><p>
+                <button onclick='change({{ item.Cart.cart_quantity|tojson }}, {{ item.Item.id|tojson }}, 0)'>-</button>
+                {{ item.Cart.cart_quantity }}
+                <button onclick='change({{ item.Cart.cart_quantity|tojson }}, {{ item.Item.id|tojson }}, 1)'>+</button></p>
+                <a class="action" href="{{ url_for('delete_from_cart', item_id=item.Item.id) }}">Delete</a>
+            </td>
+            <td id="price">$
+                <script type="text/javascript">
+                    var StringValue = parseFloat({{ item.Item.price|tojson }});
+                    document.write(StringValue.toFixed( 2 ));
+                </script>
+            </td>
         </tr>
         {% endfor %}
         <tr>
             <td>Total</td>
-            <td>${{ price }}</td>
             <td></td>
             <td></td>
+            <td>$
+                <script type="text/javascript">
+                    formatPrice({{ price }})
+                </script>
+            </td>
         </tr>
     </table>
 
-    <a class="action" href="{{ url_for('checkout', user_id=current_user.id) }}">Checkout</a>
-
+    <form action="" method="post" novalidate>
+        <input type="submit" class="checkout" name="checkout" onclick='return doubleCheck({{ price|tojson }})' value="Checkout">
+    </form>
 
 {% endblock %}

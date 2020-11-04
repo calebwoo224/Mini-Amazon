@@ -1,20 +1,26 @@
 {% extends "base.html" %}
-
+{% block title %}Order History{% endblock %}
 {% block content %}
-    <h1>{{ current_user.username }}'s Order History</h1>
+    <h1>Order History</h1>
     {% for order in history %}
     <h3>Purchase Date: {{ order["datetime"] }}</h3>
-    <table>
+    <table class="purchases_table">
         <tr>
             <th>Item</th>
             <th>Price</th>
             <th>Quantity</th>
+            <th>Seller</th>
         </tr>
     {% for purchase in order["orders"] %}
         <tr>
             <td><div><a class="action" href="{{ url_for('item', id=purchase.Item.id) }}">{{ purchase.Item.name }}</a></div></td>
-            <td>${{ purchase.OrderHistory.price_sold }}</td>
+            <td>$
+                <script type="text/javascript">
+                    formatPrice({{ purchase.OrderHistory.price_sold }});
+                </script>
+            </td>
             <td>{{ purchase.OrderHistory.quantity_sold }}</td>
+            <td>{{ purchase.Seller.username }}</td>
         </tr>
     {% endfor %}
     </table>

@@ -1,8 +1,7 @@
-INFO:werkzeug:76.204.57.157 - - [26/Oct/2020 16:16:52] "GET /index HTTP/1.1" 200 -
-INFO:werkzeug:76.204.57.157 - - [26/Oct/2020 16:17:10] "GET /seller_summary HTTP/1.1" 200 -
-INFO:werkzeug:76.204.57.157 - - [26/Oct/2020 16:17:11] "GET /add_item HTTP/1.1" 200 -
-INFO:werkzeug:76.204.57.157 - - [26/Oct/2020 16:17:18] "POST /add_item HTTP/1.1" 302 -
-INFO:werkzeug:76.204.57.157 - - [26/Oct/2020 16:17:18] "GET /index HTTP/1.1" 200 -
-INFO:werkzeug:76.204.57.157 - - [26/Oct/2020 16:17:19] "GET /6/item HTTP/1.1" 200 -
-INFO:werkzeug:76.204.57.157 - - [26/Oct/2020 16:17:22] "GET /logout HTTP/1.1" 302 -
-INFO:werkzeug:76.204.57.157 - - [26/Oct/2020 16:17:22] "GET /index HTTP/1.1" 200 -
+INFO:werkzeug: * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
+INFO:werkzeug:127.0.0.1 - - [03/Nov/2020 17:06:25] "GET / HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [03/Nov/2020 17:06:25] "GET /static/style.css HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [03/Nov/2020 17:06:29] "GET /explore_categories HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [03/Nov/2020 17:06:30] "GET /seller_reviews HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [03/Nov/2020 17:06:32] "GET /index HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [03/Nov/2020 17:06:38] "GET /2/item HTTP/1.1" 200 -
