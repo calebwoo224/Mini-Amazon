@@ -2,13 +2,13 @@ from flask import Flask, render_template, redirect, url_for, flash, request, jso
 from flask_sqlalchemy import SQLAlchemy
 from app import app
 from app import db
-from app.forms import LoginForm, AddItemForm, AddtoCart, AddReviewForm, AddSellerReviewForm, EditBalance
+from app.forms import LoginForm, AddItemForm, AddtoCart, AddReviewForm, AddSellerReviewForm, EditBalance, RegistrationForm
+from app.forms import EditProfileForm
 from flask_login import current_user, login_user, logout_user, login_required
 import logging
-from app.models import User, Item, Cart, Reviews, OrderHistory, Seller, SellerReviews
+from app.models import User, Item, Cart, Reviews, OrderHistory, Seller, SellerReviews, Category
 from datetime import datetime
 from sqlalchemy import desc
-
 
 @app.route('/')
 @app.route('/index')
@@ -38,12 +38,48 @@ def logout():
     logout_user()
     return redirect(url_for('index'))
 
+@app.route('/user/<username>')
+@login_required
+def user(username):
+    user = User.query.filter_by(username=username).first_or_404()
+    posts = []
+    return render_template('user.html', user=user, posts=posts)
 
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
+    form = RegistrationForm()
+    if form.validate_on_submit():
+        user = User(username=form.username.data, email=form.email.data)
+        user.set_password(form.password.data)
+        db.session.add(user)
+        db.session.commit()
+        flash('Congratulations, you are now a registered user!')
+        return redirect(url_for('login'))
+    return render_template('register.html', title='Register', form=form)
+
+@app.route('/edit_profile', methods=['GET', 'POST'])
+@login_required
+def edit_profile():
+    form = EditProfileForm()
+    if form.validate_on_submit():
+        current_user.username = form.username.data
+        user.set_password(form.password.data)
+        db.session.commit()
+        flash('Your changes have been saved.')
+        return redirect(url_for('edit_profile'))
+    elif request.method == 'GET':
+        form.username.data = current_user.username
+        form.password.data = current_user.password
+    return render_template('edit_profile.html', title='Edit Profile', form=form)
+    
 @app.route('/add_item', methods=['GET', 'POST'])
 def add_item():
     form = AddItemForm()
     if form.validate_on_submit():
-        item = Item(name=form.name.data, price=form.price.data, quantity=form.quantity.data, seller = current_user)
+        item = Item(name=form.name.data, price=form.price.data, quantity=form.quantity.data, seller = current_user,
+                    category = form.category.data, description = form.description.data, is_for_sale = form.is_for_sale.data)
         db.session.add(item)
         db.session.commit()
         return redirect(url_for('index'))
@@ -329,6 +365,7 @@ def add_s_review(id, name, date, location, stars, content):
 @app.route('/profile', methods=['GET', 'POST'])
 def profile():
     u = User.query.filter_by(id=current_user.id).first()
+    return render_template('profile.html', user=u)
 
 
 @app.route('/balance', methods=['GET', 'POST'])
@@ -353,3 +390,21 @@ def balance():
         flash("Successfully added ${} to balance".format(round(newbalance, 2)))
         return redirect(url_for('balance'))
     return render_template('balance.html', balance=current_balance, form=form)
+
+
+@app.route('/explore_categories', methods=['GET', 'POST'])
+def explore_categories():
+    categories = Category.query.all()
+    return render_template('explore_categories.html', title='Explore Categories', categories=categories)
+
+
+
+@app.route('/category/<name>', methods=['GET', 'POST'])
+def category(name):
+  items = categoryItems(name)
+  return render_template("category.html", title=name,items = items)
+
+def categoryItems(cat):
+  # items = category.items.all()
+  query = Item.query.filter_by(category = cat).all()
+  return query

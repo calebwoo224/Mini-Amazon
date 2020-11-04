@@ -1,9 +1,11 @@
 {% extends "base.html" %}
+
 {% block title %}{{ item.name }}{% endblock %}
 {% block content %}
     <div class="grid-container">
     <div class="item">
         <h1>{{ item.name }}</h1>
+<!--ADD IMAGE LATER?-->
         <p>
             Price: $
             <script type="text/javascript">
@@ -11,6 +13,8 @@
             </script><br>
             Quantity: {{ item.quantity }}<br>
             Seller: {{ item.seller.username }}<br>
+            Category: {{ item.category }}<br>
+            For Sale?: {{ item.is_for_sale }}<br>
             <p>
                 Description:<br>
                 <p>{{ item.description }}</p><br>
