@@ -2,10 +2,6 @@
 
 {% block title %}{{ item.name }}{% endblock %}
 {% block content %}
-    <div class="grid-container">
-    <div class="item">
-        <h1>{{ item.name }}</h1>
-<!--ADD IMAGE LATER?-->
         <p>
             Price: $
             <script type="text/javascript">
@@ -37,23 +33,28 @@
     </div>
     <div class="reviews">
         <h2>Reviews</h2>
-        <table>
-            <tr>
-                <th>Reviewer</th>
-                <th>Date</th>
-                <th>Location</th>
-                <th>Stars</th>
-                <th>Content</th>
-            </tr>
-            {% for review in reviews %}
-            <tr>
-                <td>{{ review.User.username }}</td>
-                <td>{{ review.Reviews.date_time }}</td>
-                <td>{{ review.Reviews.location }}</td>
-                <td>{{ review.Reviews.stars }}</td>
-                <td>{{ review.Reviews.content }}</td>
-            </tr>
-            {% endfor %}
+    {% if reviews | length == 0 %}
+    <h3>There are no reviews for this item</h3>
+    {% else %}
+    <table>
+        <tr>
+            <th>Reviewer</th>
+            <th>Date</th>
+            <th>Location</th>
+            <th>Stars</th>
+            <th>Content</th>
+        </tr>
+        {% for review in reviews %}
+        <tr>
+            <td>{{ review.User.username }}</td>
+            <td>{{ review.Reviews.date_time }}</td>
+            <td>{{ review.Reviews.location }}</td>
+            <td>{{ review.Reviews.stars }}</td>
+            <td>{{ review.Reviews.content }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% endif %}
         </table>
         <h2>Write a review</h2>
         <form action="" method="post" novalidate>
