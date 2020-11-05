@@ -23,6 +23,9 @@
         <input type='submit' name='cart' value='Add to cart'>
     </form>
     <h2>Reviews</h2>
+    {% if reviews | length == 0 %}
+    <h3>There are no reviews for this item</h3>
+    {% else %}
     <table>
         <tr>
             <th>Reviewer</th>
@@ -41,6 +44,7 @@
         </tr>
         {% endfor %}
     </table>
+    {% endif %}
     <h2>Write a review</h2>
     <form action="" method="post" novalidate>
         {{ review_form.hidden_tag() }}

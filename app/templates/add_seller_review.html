@@ -3,6 +3,9 @@
 {% block content %}
     <h1>{{ seller.username }}</h1>
     <h2>Reviews</h2>
+    {% if reviews | length == 0 %}
+    <h3>There are no reviews for this seller</h3>
+    {% else %}
     <table>
         <tr>
             <th>Reviewer</th>
@@ -21,6 +24,7 @@
         </tr>
         {% endfor %}
     </table>
+    {% endif %}
     <h2>Write a review</h2>
     <form action="" method="post" novalidate>
         {{ form.hidden_tag() }}
