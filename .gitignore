@@ -8,5 +8,4 @@ venv/
 .idea/
 mini_amazon.log
 app.db
-app
 mini_amazon

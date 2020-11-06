@@ -1,6 +1,6 @@
 INFO:werkzeug: * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
-INFO:werkzeug:127.0.0.1 - - [03/Nov/2020 16:21:33] "GET / HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [03/Nov/2020 16:21:33] "GET /favicon.ico HTTP/1.1" 404 -
-INFO:werkzeug:127.0.0.1 - - [03/Nov/2020 16:21:35] "GET /explore_categories HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [03/Nov/2020 16:21:37] "GET /category/Electronics HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [03/Nov/2020 16:21:38] "GET /4/item HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [05/Nov/2020 19:00:30] "GET / HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [05/Nov/2020 19:00:30] "GET /favicon.ico HTTP/1.1" 404 -
+INFO:werkzeug:127.0.0.1 - - [05/Nov/2020 19:00:31] "GET /explore_categories HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [05/Nov/2020 19:00:32] "GET /category/Office_Supplies HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [05/Nov/2020 19:00:33] "GET /1/item HTTP/1.1" 200 -
