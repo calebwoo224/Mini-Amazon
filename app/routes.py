@@ -2,7 +2,7 @@ from flask import Flask, render_template, redirect, url_for, flash, request, jso
 from flask_sqlalchemy import SQLAlchemy
 from app import app
 from app import db
-from app.forms import LoginForm, AddItemForm, AddtoCart, AddReviewForm, AddSellerReviewForm, EditBalance, RegistrationForm
+from app.forms import LoginForm, AddItemForm, AddtoCart, AddReviewForm, AddSellerReviewForm, EditBalance, RegistrationForm, EditItemForm
 from app.forms import EditProfileForm
 from flask_login import current_user, login_user, logout_user, login_required
 import logging
@@ -91,6 +91,25 @@ def get_item(item_id):
     if item is None:
         flash("Item doesn't exist")
     return item
+
+
+@app.route('/<id>/edit_item', methods=['GET', 'POST'])
+def edit_item(id):
+    item = get_item(id)
+    form = EditItemForm(obj=item)
+    if form.validate_on_submit():
+        item.name = form.name.data
+        item.price = form.price.data
+        item.quantity = form.quantity.data
+        item.seller = current_user
+        item.catagory = form.category.data
+        item.description = form.description.data
+        item.is_for_sale = form.is_for_sale.data
+        db.session.commit()
+        flash('Your changes have been saved.')
+        return redirect(url_for('seller_summary'))
+    return render_template('edit_item.html', title='Edit Item', form=form)
+
 
 
 @app.route('/<id>/item', methods=['GET', 'POST'])
