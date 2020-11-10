@@ -2,6 +2,9 @@ from app import app
 from app import db
 import pandas as pd
 from app.models import User, Item, Reviews, Seller, OrderHistory, SellerReviews, Category
+from datetime import datetime
+import random
+import string
 
 def Load_Data(file_name):
     df = pd.read_csv(file_name)
@@ -25,8 +28,15 @@ def seller_init(dic):
 
 def item_init(dic):
     i = 0
+    categories = ['cat1', 'cat2', 'cat3']
     for key in dic['name']:
         seller = Seller.query.filter_by(username=dic['merchant_id'][key]).first()
+        cat = dic['amazon_category_and_sub_category'][key]
+        if pd.isna(cat) is True:
+            cat = 'Other'
+        else:
+            cats = cat.split(' > ')
+            cat = cats[0]
         if not seller:
             toAdd = Seller(username=str(dic['merchant_id'][key]), email=str(dic['merchant_id'][key]) + str(i) + "@NULL")
             i += 1
@@ -34,10 +44,14 @@ def item_init(dic):
             db.session.add(toAdd)
         item = Item(name=dic['name'][key], price=dic['price'][key],
                     quantity=dic['quantity'][key], description=dic['description'][key],
-                    seller=Seller.query.filter_by(username=dic['merchant_id'][key]).first())
+                    seller=Seller.query.filter_by(username=dic['merchant_id'][key]).first(), category=cat)
         db.session.add(item)
     db.session.commit()
 
+def get_random_string(length):
+    letters = string.ascii_lowercase
+    result_str = ''.join(random.choice(letters) for i in range(length))
+    return result_str
 
 def seed_db():
     db.drop_all()
@@ -47,6 +61,18 @@ def seed_db():
     seller_init(Load_Data('initTables/Seller.csv'))
     db.session.commit()
     item_init(Load_Data('initTables/Item.csv'))
+    db.session.commit()
+    date = '' + str(datetime.now().month) + '/' + str(datetime.now().day) + '/' + str(datetime.now().year)
+    location = ['USA', 'Canada', 'United Kingdom', 'China', 'Japan']
+    stars = [1, 2, 3, 4, 5]
+    user_id = []
+    for user in User.query.all():
+        user_id.append(user.id)
+    for item in Item.query.all():
+        for i in range(5):
+            review = Reviews(user_id=random.choice(user_id), item_id=item.id, date_time=date,location=random.choice(location),
+            stars=random.choice(stars), content=get_random_string(10))
+            db.session.add(review)
     db.session.commit()
 
 
