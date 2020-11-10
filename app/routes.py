@@ -9,11 +9,25 @@ import logging
 from app.models import User, Item, Cart, Reviews, OrderHistory, Seller, SellerReviews, Category
 from datetime import datetime
 from sqlalchemy import desc
+from sqlalchemy.sql import func
 
 @app.route('/')
 @app.route('/index')
 def index():
     items = Item.query.all()
+    avg_ratings = {}
+    sorted_ratings = {}
+    all_cats = set([])
+    for item in items:
+        avg_stars = db.session.query(func.avg(Reviews.stars)).filter(Reviews.item_id==item.id).first()
+        if item.category in avg_ratings:
+            avg_ratings[item.category][item.id] = avg_stars[0]
+        else:
+            all_cats.add(item.category)
+            avg_ratings[item.category] = {}
+            avg_ratings[item.category][item.id] = avg_stars[0]
+    for cat in all_cats:
+        sorted_ratings[cat] = {k: v for k, v in sorted(avg_ratings[cat].items(), key=lambda item: item[1], reverse=True)}
     return render_template("index.html", title='Home Page', items=items)
 
 
