@@ -16,6 +16,7 @@ class LoginForm(FlaskForm):
     remember_me = BooleanField('Remember Me')
     submit = SubmitField('Sign In')
 
+
 class RegistrationForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])
     email = StringField('Email', validators=[DataRequired(), Email()])
@@ -34,6 +35,7 @@ class RegistrationForm(FlaskForm):
         if user is not None:
             raise ValidationError('Please use a different email address.')
 
+
 class EditProfileForm(FlaskForm):
     username = StringField('New username', validators=[DataRequired()])
     password = StringField('New password', validators=[DataRequired()])
@@ -47,8 +49,8 @@ class AddItemForm(FlaskForm):
     description = StringField('Brief Description', validators=[DataRequired()])
     # ADD IMAGE LATER?
     category_list = list(Category.query.all())
-    category = SelectField('Category', choices=category_list, default= "Other")
-    is_for_sale = BooleanField("Is for sale?", validators=[DataRequired()])
+    category = SelectField('Category', choices=category_list, default="Other")
+    is_for_sale = BooleanField("Is for sale?")
     submit = SubmitField('Add Item')
 
 

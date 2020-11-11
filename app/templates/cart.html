@@ -40,7 +40,7 @@
     </table>
 
     <form action="" method="post" novalidate>
-        <input type="submit" class="checkout" name="checkout" onclick='return doubleCheck({{ price|tojson }})' value="Checkout">
+        <input type="submit" name="checkout" onclick='return doubleCheck({{ price|tojson }})' value="Checkout">
     </form>
 
 {% endblock %}

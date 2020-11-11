@@ -10,11 +10,16 @@ from app.models import User, Item, Cart, Reviews, OrderHistory, Seller, SellerRe
 from datetime import datetime
 from sqlalchemy import desc
 
+
 @app.route('/')
 @app.route('/index')
 def index():
-    items = Item.query.all()
-    return render_template("index.html", title='Home Page', items=items)
+    if current_user.is_authenticated:
+        items = Item.query.all()
+        return render_template("index.html", title='Home Page', items=items)
+    else:
+        flash("Please login to access the Home Page")
+        return redirect(url_for('login'))
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -36,7 +41,8 @@ def login():
 @app.route('/logout')
 def logout():
     logout_user()
-    return redirect(url_for('index'))
+    return redirect(url_for('login'))
+
 
 @app.route('/user/<username>')
 @login_required
@@ -44,6 +50,7 @@ def user(username):
     user = User.query.filter_by(username=username).first_or_404()
     posts = []
     return render_template('user.html', user=user, posts=posts)
+
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -59,6 +66,7 @@ def register():
         return redirect(url_for('login'))
     return render_template('register.html', title='Register', form=form)
 
+
 @app.route('/edit_profile', methods=['GET', 'POST'])
 @login_required
 def edit_profile():
@@ -73,7 +81,8 @@ def edit_profile():
         form.username.data = current_user.username
         form.password.data = current_user.password
     return render_template('edit_profile.html', title='Edit Profile', form=form)
-    
+
+
 @app.route('/add_item', methods=['GET', 'POST'])
 def add_item():
     form = AddItemForm()
@@ -102,6 +111,9 @@ def item(id):
     if 'cart' in request.form:
         if current_user.is_anonymous:
             flash('To add an item to cart, please login')
+            return redirect(url_for('item', id=id))
+        if item.is_for_sale is False:
+            flash("Item is not for sale. Cannot add to cart")
             return redirect(url_for('item', id=id))
         add_to_cart(item.id, form.item_quantity.data)
     if 'review' in request.form:
@@ -171,23 +183,21 @@ def cart():
                                                    (Cart.item_id == Item.id)).filter(Cart.buyer_id ==
                                                                                      current_user.id).all()
     for i in cart_items:
-        if i.Item.quantity < i.Cart.cart_quantity:  # not enough anymore
-            flash("Item {} no longer in stock in the quantity desired. Your cart quantity was changed to 0".format(i.Item.name))
+        if i.Item.quantity < i.Cart.cart_quantity or i.Item.is_for_sale is False:  # not enough anymore
+            flash("Item {} no longer in stock in the quantity desired. "
+                  "Your cart quantity was changed to 0".format(i.Item.name))
             i.Cart.cart_quantity = 0
             db.session.commit()
 
     price = total_price(cart_items)
-    checkout_status = False
     if 'checkout' in request.form:
         for i in cart_items:
-            if i.Item.quantity < i.Cart.cart_quantity:  # not enough anymore
-                flash("Item {} no longer in stock in the quantity desired. Your cart quantity was changed to 0".format(
-                    i.Item.name))
+            if i.Item.quantity < i.Cart.cart_quantity or i.Item.is_for_sale is False:  # not enough anymore
+                flash("Item {} no longer in stock in the quantity desired. "
+                      "Your cart quantity was changed to 0".format(i.Item.name))
                 i.Cart.cart_quantity = 0
                 db.session.commit()
-
         return checkout(current_user.id)
-
     return render_template('cart.html', cart=cart_items, price=price)
 
 
@@ -232,15 +242,13 @@ def checkout(user_id):
         new_quantity = db_item.quantity - cart_item.cart_quantity
         if cart_item.cart_quantity <= 0:
             continue
-        if new_quantity < 0:
+        if new_quantity < 0 or db_item.is_for_sale is False:
             flash("Item {} no longer available in this quantity. Not included in final checkout".format(db_item.name))
             continue
         if current_user.balance < db_item.price:
             flash("Item {} price changed. Your balance is not enough".format(db_item.name))
             continue
         current_user.balance -= (db_item.price*cart_item.cart_quantity)
-        if seller.balance is None:
-            seller.balance = 0
         seller.balance += (db_item.price*cart_item.cart_quantity)
         db_item.quantity = new_quantity
         items_checked_out.append(db_item.name)
@@ -387,7 +395,7 @@ def balance():
             return redirect(url_for('balance'))
         u.balance += newbalance
         db.session.commit()
-        flash("Successfully added ${} to balance".format(round(newbalance, 2)))
+        flash("Successfully added ${:.2f} to balance".format(round(newbalance, 2)))
         return redirect(url_for('balance'))
     return render_template('balance.html', balance=current_balance, form=form)
 
@@ -398,13 +406,13 @@ def explore_categories():
     return render_template('explore_categories.html', title='Explore Categories', categories=categories)
 
 
-
 @app.route('/category/<name>', methods=['GET', 'POST'])
 def category(name):
-  items = categoryItems(name)
-  return render_template("category.html", title=name,items = items)
+    items = categoryItems(name)
+    return render_template("category.html", title=name,items = items)
+
 
 def categoryItems(cat):
-  # items = category.items.all()
-  query = Item.query.filter_by(category = cat).all()
-  return query
+    # items = category.items.all()
+    query = Item.query.filter_by(category = cat).all()
+    return query
