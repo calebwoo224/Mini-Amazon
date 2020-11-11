@@ -13,7 +13,7 @@ class User(UserMixin, db.Model):
     reviews = db.relationship('Reviews', backref='user')
     seller_reviews = db.relationship('SellerReviews', backref='user')
     type = db.Column(db.String(50))
-    balance = db.Column(db.Float)
+    balance = db.Column(db.Float, default=0)
     __mapper_args__ = {'polymorphic_identity': 'user', 'polymorphic_on': type}
 
     def __repr__(self):
@@ -27,7 +27,6 @@ class User(UserMixin, db.Model):
 
     def add_balance(self, balance):
         self.balance=balance
-
 
 
 @login.user_loader
@@ -57,8 +56,6 @@ class Item(db.Model):
     description = db.Column(db.String(300), default="No description available")
     is_for_sale = db.Column(db.Boolean, default=True)
     merchant_id = db.Column(db.Integer, db.ForeignKey('Seller.id'))
-    description = db.Column(db.String(200))
-
 
     def __repr__(self):
         return '<Item {}>'.format(self.name)
@@ -115,10 +112,11 @@ class SellerReviews(db.Model):
 # I think add this to Seller class
 # seller_reviews = db.relationship('SellerReviews', backref='seller_id')
 
+
 class Category(db.Model):
     # category_id needed for clarity in other functions???
     # category_id = db.Column(db.String(4), nullable = False, primary_key = True)
-    name = db.Column(db.String(45), primary_key = True)
+    name = db.Column(db.String(45), primary_key=True)
     items = db.relationship('Item', backref='categoryItem')
 
     def __repr__(self):
