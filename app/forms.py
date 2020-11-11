@@ -53,6 +53,16 @@ class AddItemForm(FlaskForm):
     is_for_sale = BooleanField("Is for sale?")
     submit = SubmitField('Add Item')
 
+class EditItemForm(FlaskForm):
+    name = StringField('Item Name', validators=[DataRequired()], default = 1)
+    price = DecimalField('Item Price', validators=[DataRequired()], places=2)
+    quantity = IntegerField('Item Quantity', validators=[DataRequired()])
+    description = StringField('Brief Description', validators=[DataRequired()])
+    category_list = list(Category.query.all())
+    category = SelectField('Category', choices=category_list, default= "Other")
+    is_for_sale = BooleanField("Is for sale?", validators=[DataRequired()])  
+    submit = SubmitField('Edit Item')
+
 
 class AddtoCart(FlaskForm):
     item_quantity = SelectField(u'Quantity')

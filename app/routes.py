@@ -2,13 +2,14 @@ from flask import Flask, render_template, redirect, url_for, flash, request, jso
 from flask_sqlalchemy import SQLAlchemy
 from app import app
 from app import db
-from app.forms import LoginForm, AddItemForm, AddtoCart, AddReviewForm, AddSellerReviewForm, EditBalance, RegistrationForm
+from app.forms import LoginForm, AddItemForm, AddtoCart, AddReviewForm, AddSellerReviewForm, EditBalance, RegistrationForm, EditItemForm
 from app.forms import EditProfileForm
 from flask_login import current_user, login_user, logout_user, login_required
 import logging
 from app.models import User, Item, Cart, Reviews, OrderHistory, Seller, SellerReviews, Category
 from datetime import datetime
 from sqlalchemy import desc
+from sqlalchemy.sql import func
 
 
 @app.route('/')
@@ -16,6 +17,19 @@ from sqlalchemy import desc
 def index():
     if current_user.is_authenticated:
         items = Item.query.all()
+        avg_ratings = {}
+        sorted_ratings = {}
+        all_cats = set([])
+        for item in items:
+            avg_stars = db.session.query(func.avg(Reviews.stars)).filter(Reviews.item_id==item.id).first()
+            if item.category in avg_ratings:
+                avg_ratings[item.category][item.id] = avg_stars[0]
+            else:
+                all_cats.add(item.category)
+                avg_ratings[item.category] = {}
+                avg_ratings[item.category][item.id] = avg_stars[0]
+        for cat in all_cats:
+            sorted_ratings[cat] = {k: v for k, v in sorted(avg_ratings[cat].items(), key=lambda item: item[1], reverse=True)}
         return render_template("index.html", title='Home Page', items=items)
     else:
         flash("Please login to access the Home Page")
@@ -100,6 +114,25 @@ def get_item(item_id):
     if item is None:
         flash("Item doesn't exist")
     return item
+
+
+@app.route('/<id>/edit_item', methods=['GET', 'POST'])
+def edit_item(id):
+    item = get_item(id)
+    form = EditItemForm(obj=item)
+    if form.validate_on_submit():
+        item.name = form.name.data
+        item.price = form.price.data
+        item.quantity = form.quantity.data
+        item.seller = current_user
+        item.catagory = form.category.data
+        item.description = form.description.data
+        item.is_for_sale = form.is_for_sale.data
+        db.session.commit()
+        flash('Your changes have been saved.')
+        return redirect(url_for('seller_summary'))
+    return render_template('edit_item.html', title='Edit Item', form=form)
+
 
 
 @app.route('/<id>/item', methods=['GET', 'POST'])

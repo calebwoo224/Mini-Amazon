@@ -40,7 +40,6 @@ class Seller(User):
     seller_id = db.Column('id', db.Integer, db.ForeignKey('user.id'), primary_key=True)
     sells = db.relationship('Item', backref='seller', lazy='dynamic')
     seller_reviews = db.relationship('SellerReviews', backref='seller')
-
     def __repr__(self):
         return '<Seller {}>'.format(self.seller_id)
 
