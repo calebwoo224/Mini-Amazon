@@ -6,10 +6,11 @@ from datetime import datetime
 import random
 import string
 
+
 def Load_Data(file_name):
     df = pd.read_csv(file_name)
     dic = df.to_dict()
-    return (dic)
+    return dic
 
 
 def user_init(dic):
@@ -48,10 +49,12 @@ def item_init(dic):
         db.session.add(item)
     db.session.commit()
 
+
 def get_random_string(length):
     letters = string.ascii_lowercase
     result_str = ''.join(random.choice(letters) for i in range(length))
     return result_str
+
 
 def seed_db():
     db.drop_all()
@@ -61,7 +64,7 @@ def seed_db():
     seller_init(Load_Data('initTables/Seller.csv'))
     db.session.commit()
     item_init(Load_Data('initTables/Item.csv'))
-    category = Category(name = "Other")
+    category = Category(name="Other")
     db.session.add(category)
     seller1 = Seller(username='test7', email='test7@example.com', balance=2000)
     seller1.set_password('123')
@@ -70,22 +73,7 @@ def seed_db():
     seller2.set_password('345')
     db.session.add(seller2)
     db.session.commit()
-<<<<<<< HEAD
-    item = Item(name='pens', price=3.00, quantity=30, seller=seller1)
-    db.session.add(item)
-    item2 = Item(name='books', price=0.90, quantity=400, seller=seller2)
-    db.session.add(item2)
-    item3 = Item(name='Sprite', price=18.50, quantity=13, seller=seller2)
-    db.session.add(item3)
-    item4 = Item(name='RTX 3090', price=32.99, quantity=3, seller=seller1)
-    db.session.add(item4)
-    item5 = Item(name='Tachyons', price=45.00, quantity=211, seller=seller1)
-    db.session.add(item5)
-    item6 = Item(name='Pencil', price=.99, quantity=2, seller=seller1)
-    db.session.add(item6)
-    db.session.commit()
-    
-=======
+
     date = '' + str(datetime.now().month) + '/' + str(datetime.now().day) + '/' + str(datetime.now().year)
     location = ['USA', 'Canada', 'United Kingdom', 'China', 'Japan']
     stars = [1, 2, 3, 4, 5]
@@ -94,12 +82,12 @@ def seed_db():
         user_id.append(user.id)
     for item in Item.query.all():
         for i in range(5):
-            review = Reviews(user_id=random.choice(user_id), item_id=item.id, date_time=date,location=random.choice(location),
-            stars=random.choice(stars), content=get_random_string(10))
+            review = Reviews(user_id=random.choice(user_id), item_id=item.id, date_time=date,
+                             location=random.choice(location),
+                             stars=random.choice(stars), content=get_random_string(10))
             db.session.add(review)
     db.session.commit()
 
 
->>>>>>> d707e5f91d71a6a53ed4c4c6cc26c0247ec5d816
 if __name__ == '__main__':
     seed_db()
