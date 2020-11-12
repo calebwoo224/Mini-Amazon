@@ -50,7 +50,6 @@ class Item(db.Model):
     price = db.Column(db.Float, nullable=False)
     quantity = db.Column(db.Integer, nullable=False)
     reviews = db.relationship('Reviews', backref='item')
-    # image = ...   ADD IMAGE LATER?
     # avg_user_rating = ...
     category = db.Column(db.String(45), db.ForeignKey('category.name'))
     description = db.Column(db.String(300), default="No description available")

@@ -5,6 +5,8 @@ from app.models import User, Item, Reviews, Seller, OrderHistory, SellerReviews,
 from datetime import datetime
 import random
 import string
+#from google_images_search import GoogleImagesSearch
+
 
 
 def Load_Data(file_name):
@@ -28,8 +30,11 @@ def seller_init(dic):
 
 
 def item_init(dic):
+    
+    #gis = GoogleImagesSearch('Null', 'Null')
     i = 0
     categories = ['cat1', 'cat2', 'cat3']
+    catz = []
     for key in dic['name']:
         seller = Seller.query.filter_by(username=dic['merchant_id'][key]).first()
         cat = dic['amazon_category_and_sub_category'][key]
@@ -38,6 +43,11 @@ def item_init(dic):
         else:
             cats = cat.split(' > ')
             cat = cats[0]
+
+            if cat not in catz:
+              toAdd = Category(name=cat)
+              db.session.add(toAdd)
+              catz.append(cat)
         if not seller:
             toAdd = Seller(username=str(dic['merchant_id'][key]), email=str(dic['merchant_id'][key]) + str(i) + "@NULL")
             i += 1
@@ -47,7 +57,16 @@ def item_init(dic):
                     quantity=dic['quantity'][key], description=dic['description'][key],
                     seller=Seller.query.filter_by(username=dic['merchant_id'][key]).first(), category=cat)
         db.session.add(item)
+    #for name in catz:
+        #_search_params = {
+        #'q': name,
+        #'num': 1,
+        #"print_urls":True 
+        #}
+        #print(name)
+        #gis.search(search_params=_search_params, path_to_dir='Images', width=500, height=500, custom_image_name=str(name))
     db.session.commit()
+
 
 
 def get_random_string(length):
@@ -73,6 +92,22 @@ def seed_db():
     seller2.set_password('345')
     db.session.add(seller2)
     db.session.commit()
+
+
+    item = Item(name='pens', price=3.00, quantity=30, seller=seller1)
+    db.session.add(item)
+    item2 = Item(name='books', price=0.90, quantity=400, seller=seller2)
+    db.session.add(item2)
+    item3 = Item(name='Sprite', price=18.50, quantity=13, seller=seller2)
+    db.session.add(item3)
+    item4 = Item(name='RTX 3090', price=32.99, quantity=3, seller=seller1)
+    db.session.add(item4)
+    item5 = Item(name='Tachyons', price=45.00, quantity=211, seller=seller1)
+    db.session.add(item5)
+    item6 = Item(name='Pencil', price=.99, quantity=2, seller=seller1)
+    db.session.add(item6)
+    db.session.commit()
+    
 
     date = '' + str(datetime.now().month) + '/' + str(datetime.now().day) + '/' + str(datetime.now().year)
     location = ['USA', 'Canada', 'United Kingdom', 'China', 'Japan']

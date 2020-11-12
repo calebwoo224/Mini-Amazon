@@ -1,8 +1,9 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>All Categories</h1>
 
+    <h1>All Categories</h1>
+    
     {% for category in categories %}
         <div><a class="action" href="{{ url_for('category', name=category) }}">{{ category.name }}</a></div>
     {% endfor %}
