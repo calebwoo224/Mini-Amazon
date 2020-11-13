@@ -2,30 +2,33 @@
 {% block title %}Cart{% endblock %}
 {% block content %}
     <h1>Shopping Cart</h1>
-    <table class="purchases_table">
+    <table class="generic_table">
+    <thead>
         <tr>
             <th></th>
             <th>Item</th>
             <th>Quantity</th>
-            <th>Price</th>
+            <th>Unit Price</th>
         </tr>
+        </thead>
+    <tbody>
         {% for item in cart %}
-        <tr>
-            <td></td>
-            <td><div><a class="action" href="{{ url_for('item', id=item.Item.id) }}">{{ item.Item.name }}</a></div></td>
-            <td><p>
-                <button onclick='change({{ item.Cart.cart_quantity|tojson }}, {{ item.Item.id|tojson }}, 0)'>-</button>
-                {{ item.Cart.cart_quantity }}
-                <button onclick='change({{ item.Cart.cart_quantity|tojson }}, {{ item.Item.id|tojson }}, 1)'>+</button></p>
-                <a class="action" href="{{ url_for('delete_from_cart', item_id=item.Item.id) }}">Delete</a>
-            </td>
-            <td id="price">$
-                <script type="text/javascript">
-                    var StringValue = parseFloat({{ item.Item.price|tojson }});
-                    document.write(StringValue.toFixed( 2 ));
-                </script>
-            </td>
-        </tr>
+            <tr>
+                <td></td>
+                <td><div><a class="action" href="{{ url_for('item', id=item.Item.id) }}">{{ item.Item.name }}</a></div></td>
+                <td><p>
+                    <button onclick='change({{ item.Cart.cart_quantity|tojson }}, {{ item.Item.id|tojson }}, 0)'>-</button>
+                    {{ item.Cart.cart_quantity }}
+                    <button onclick='change({{ item.Cart.cart_quantity|tojson }}, {{ item.Item.id|tojson }}, 1)'>+</button></p>
+                    <a class="action" href="{{ url_for('delete_from_cart', item_id=item.Item.id) }}">Delete</a>
+                </td>
+                <td id="price">$
+                    <script type="text/javascript">
+                        var StringValue = parseFloat({{ item.Item.price|tojson }});
+                        document.write(StringValue.toFixed( 2 ));
+                    </script>
+                </td>
+            </tr>
         {% endfor %}
         <tr>
             <td>Total</td>
@@ -37,6 +40,7 @@
                 </script>
             </td>
         </tr>
+    </tbody>
     </table>
 
     <form action="" method="post" novalidate>

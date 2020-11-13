@@ -1,25 +1,29 @@
 {% extends "base.html" %}
-
+{% block title %}Seller Summary{% endblock %}
 {% block content %}
-    <h1>{{ current_user.username }}'s Items For Sale</h1>
-    <table class="purchases_table">
+    <h1>Your items for sale</h1>
+    <table class="generic_table">
         <tr>
             <th>Item</th>
             <th>Price</th>
             <th>Quantity</th>
+            <th>For Sale</th>
+            <th></th>
         </tr>
         {% for item in items %}
-        <tr>
-            <td><div><a class="action" href="{{ url_for('item', id=item.id) }}">{{ item.name }}</a></div></td>
-            <td>${{ item.price }}</td>
-            <td>{{ item.quantity }}</td>
-            <td><div><a class="action" href="{{ url_for('edit_item', id=item.id) }}"> Edit item </a></div></td>
-        </tr>
+            <tr>
+                <td><div><a class="action" href="{{ url_for('item', id=item.id) }}">{{ item.name }}</a></div></td>
+                <td>${{ item.price }}</td>
+                <td>{{ item.quantity }}</td>
+                {% if item.is_for_sale %}
+                    <td>Yes</td>
+                {% else %}
+                    <td>No</td>
+                {% endif %}
+                <td><div><a class="action" href="{{ url_for('edit_item', id=item.id) }}"> Edit item </a></div></td>
+            </tr>
         {% endfor %}
-        <tr>
-            <td></td>
-            <td></td>
-        </tr>
+
     </table>
     <br>
     <a href="{{ url_for('add_item') }}">Add Item</a>

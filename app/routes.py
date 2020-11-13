@@ -17,6 +17,7 @@ from sqlalchemy.sql import func
 def index():
     if current_user.is_authenticated:
         items = Item.query.all()
+        """
         avg_ratings = {}
         sorted_ratings = {}
         all_cats = set([])
@@ -30,6 +31,7 @@ def index():
                 avg_ratings[item.category][item.id] = avg_stars[0]
         for cat in all_cats:
             sorted_ratings[cat] = {k: v for k, v in sorted(avg_ratings[cat].items(), key=lambda item: item[1], reverse=True)}
+        """
         return render_template("index.html", title='Home Page', items=items)
     else:
         flash("Please login to access the Home Page")
@@ -161,7 +163,7 @@ def item(id):
 
 def update_cart(item, form):
     quantity = item.quantity
-    if quantity == 0:
+    if quantity == 0 or item.is_for_sale is False:
         form.item_quantity.choices = [0]
     else:
         if quantity > 20:
@@ -442,7 +444,7 @@ def explore_categories():
 @app.route('/category/<name>', methods=['GET', 'POST'])
 def category(name):
     items = categoryItems(name)
-    return render_template("category.html", title=name,items = items)
+    return render_template("category.html", title=name, items=items)
 
 
 def categoryItems(cat):

@@ -10,7 +10,11 @@
             <script type="text/javascript">
                 formatPrice({{ item.price }});
             </script><br>
-            Quantity: {{ item.quantity }}<br>
+            {% if item.is_for_sale %}
+                Quantity: {{ item.quantity }}<br>
+            {% else %}
+                Quantity: 0<br>
+            {% endif %}
             Seller: {{ item.seller.username }}<br>
             Category: {{ item.category }}<br>
             In Stock: {{ item.is_for_sale }}<br>
