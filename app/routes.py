@@ -3,7 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from app import app
 from app import db
 from app.forms import LoginForm, AddItemForm, AddtoCart, AddReviewForm, AddSellerReviewForm, EditBalance, RegistrationForm, EditItemForm
-from app.forms import EditProfileForm
+from app.forms import QuestionForm, UsernameForm, PasswordForm
 from flask_login import current_user, login_user, logout_user, login_required
 import logging
 from app.models import User, Item, Cart, Reviews, OrderHistory, Seller, SellerReviews, Category
@@ -47,6 +47,57 @@ def login():
     return render_template('login.html', title='Sign In', form=form)
 
 
+@app.route('/getusername', methods=['GET', 'POST'])
+def getusername():
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
+    username_form = UsernameForm()
+    if 'name' in request.form:
+        user = User.query.filter_by(username=username_form.username.data).first()
+        if user is None:
+            flash('User does not exist')
+            return redirect(url_for('getusername'))
+        # question= user.security_question
+        return redirect(url_for('answerquestion', uid=user.id))
+    return render_template('getusername.html', username_form=username_form)
+
+
+"""in the html, link to the answerquestion, pass it the username or id"""
+
+@app.route('/<uid>/answerquestion', methods=['GET', 'POST'])
+def answerquestion(uid):
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
+    user = User.query.filter_by(id=uid).first()
+    question=user.security_question
+    question_form=QuestionForm()
+    if 'answer' in request.form:
+        answer= question_form.securityanswer.data
+        if user.check_securityanswer(answer):
+            return redirect(url_for('setnewpassword', uid=uid))
+        else:
+            flash('Wrong answer, try again')
+            return redirect(url_for('answerquestion', uid=uid))
+        # question= user.security_question
+    return render_template('answerquestion.html', question=question, question_form=question_form)
+    
+
+"""get question here"""
+
+@app.route('/<uid>/setnewpassword', methods=['GET', 'POST'])
+def setnewpassword(uid):
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
+    user = User.query.filter_by(id=uid).first()
+    form= PasswordForm()
+    if 'password' in request.form:
+        user.set_password(form.password.data)
+        db.session.add(user)
+        db.session.commit()
+        return redirect(url_for('login'))
+    return render_template('setnewpassword.html', form=form)
+
+
 @app.route('/logout')
 def logout():
     logout_user()
@@ -67,29 +118,30 @@ def register():
         return redirect(url_for('index'))
     form = RegistrationForm()
     if form.validate_on_submit():
-        user = User(username=form.username.data, email=form.email.data)
-        user.set_password(form.password.data)
-        db.session.add(user)
-        db.session.commit()
-        flash('Congratulations, you are now a registered user!')
-        return redirect(url_for('login'))
+        user = User.query.filter_by(username=form.username.data).first()
+        if user is not None:
+            flash('Username already exists, pick a different one')
+            return redirect(url_for('register'))
+        if form.is_seller.data is True:
+            seller = Seller(username=form.username.data, email=form.email.data)
+            seller.set_password(form.password.data)
+            seller.security_question = form.securityquestion.data
+            seller.set_securityanswer(form.securityanswer.data)
+            db.session.add(seller)
+            db.session.commit()
+            flash('Congratulations, you are now a registered seller!')
+            return redirect(url_for('login'))
+        else:
+            user = User(username=form.username.data, email=form.email.data)
+            user.set_password(form.password.data)
+            user.security_question = form.securityquestion.data
+            user.set_securityanswer(form.securityanswer.data)
+            db.session.add(user)
+            db.session.commit()
+            flash('Congratulations, you are now a registered user!')
+            return redirect(url_for('login'))
     return render_template('register.html', title='Register', form=form)
 
-
-@app.route('/edit_profile', methods=['GET', 'POST'])
-@login_required
-def edit_profile():
-    form = EditProfileForm()
-    if form.validate_on_submit():
-        current_user.username = form.username.data
-        user.set_password(form.password.data)
-        db.session.commit()
-        flash('Your changes have been saved.')
-        return redirect(url_for('edit_profile'))
-    elif request.method == 'GET':
-        form.username.data = current_user.username
-        form.password.data = current_user.password
-    return render_template('edit_profile.html', title='Edit Profile', form=form)
 
 
 @app.route('/add_item', methods=['GET', 'POST'])

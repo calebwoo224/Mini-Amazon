@@ -32,6 +32,27 @@
             <span style="color: red;">[{{ error }}]</span>
             {% endfor %}
         </p>
+        <p>
+            {{ form.securityquestion.label }}<br>
+            {{ form.securityquestion(size=32) }}<br>
+            {% for error in form.securityquestion.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.securityanswer.label }}<br>
+            {{ form.securityanswer(size=32) }}<br>
+            {% for error in form.securityanswer.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.is_seller.label }}<br>
+            {{ form.is_seller(size=32) }}<br>
+            {% for error in form.is_seller.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
         <p>{{ form.submit() }}</p>
     </form>
 {% endblock %}
