@@ -5,6 +5,7 @@ from app.models import User, Item, Reviews, Seller, OrderHistory, SellerReviews,
 from datetime import datetime
 import random
 import string
+from sqlalchemy.sql import func
 
 
 def Load_Data(file_name):
@@ -29,7 +30,6 @@ def seller_init(dic):
 
 def item_init(dic):
     i = 0
-    categories = ['cat1', 'cat2', 'cat3']
     for key in dic['name']:
         seller = Seller.query.filter_by(username=dic['merchant_id'][key]).first()
         cat = dic['amazon_category_and_sub_category'][key]
@@ -43,9 +43,22 @@ def item_init(dic):
             i += 1
             toAdd.set_password('123')
             db.session.add(toAdd)
-        item = Item(name=dic['name'][key], price=dic['price'][key],
+        item = Item(id=key,name=dic['name'][key], price=dic['price'][key],
                     quantity=dic['quantity'][key], description=dic['description'][key],
                     seller=Seller.query.filter_by(username=dic['merchant_id'][key]).first(), category=cat)
+        date = '' + str(datetime.now().month) + '/' + str(datetime.now().day) + '/' + str(datetime.now().year)
+        location = ['USA', 'Canada', 'United Kingdom', 'China', 'Japan']
+        stars = [1, 2, 3, 4, 5]
+        user_id = []
+        for user in User.query.all():
+            user_id.append(user.id)
+        for i in range(5):
+            review = Reviews(user_id=random.choice(user_id), item_id=item.id, date_time=date,
+                             location=random.choice(location),
+                             stars=random.choice(stars), content=get_random_string(10))
+            db.session.add(review)
+        avg_stars = db.session.query(func.avg(Reviews.stars)).filter(Reviews.item_id==item.id).first()
+        item.avg_user_rating = avg_stars[0]
         db.session.add(item)
     db.session.commit()
 
@@ -72,20 +85,6 @@ def seed_db():
     seller2 = Seller(username='test8', email='test8@example.com', balance=2000)
     seller2.set_password('345')
     db.session.add(seller2)
-    db.session.commit()
-
-    date = '' + str(datetime.now().month) + '/' + str(datetime.now().day) + '/' + str(datetime.now().year)
-    location = ['USA', 'Canada', 'United Kingdom', 'China', 'Japan']
-    stars = [1, 2, 3, 4, 5]
-    user_id = []
-    for user in User.query.all():
-        user_id.append(user.id)
-    for item in Item.query.all():
-        for i in range(5):
-            review = Reviews(user_id=random.choice(user_id), item_id=item.id, date_time=date,
-                             location=random.choice(location),
-                             stars=random.choice(stars), content=get_random_string(10))
-            db.session.add(review)
     db.session.commit()
 
 

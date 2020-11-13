@@ -9,7 +9,6 @@
     <h1>Mini-Amazon</h1>
     <ul>
         <li><a href="{{ url_for('index') }}">Home</a></li>
-        <li><a href="{{ url_for('seller_reviews') }}">Seller Reviews</a></li>
         <li><a href="{{ url_for('explore_categories') }}">Categories</a></li>
         {% if current_user.is_anonymous %}
             <li><a href="{{ url_for('login') }}">Login</a></li>
