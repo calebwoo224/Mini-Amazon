@@ -158,7 +158,7 @@ def item(id):
 
 def update_cart(item, form):
     quantity = item.quantity
-    if quantity == 0:
+    if quantity == 0 or item.is_for_sale is False:
         form.item_quantity.choices = [0]
     else:
         if quantity > 20:
@@ -433,7 +433,7 @@ def explore_categories():
 @app.route('/category/<name>', methods=['GET', 'POST'])
 def category(name):
     items = categoryItems(name)
-    return render_template("category.html", title=name,items = items)
+    return render_template("category.html", title=name, items=items)
 
 
 def categoryItems(cat):

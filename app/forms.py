@@ -50,8 +50,9 @@ class AddItemForm(FlaskForm):
     # ADD IMAGE LATER?
     category_list = list(Category.query.all())
     category = SelectField('Category', choices=category_list, default="Other")
-    is_for_sale = BooleanField("Is for sale?")
+    is_for_sale = BooleanField("Is for sale?", default=False)
     submit = SubmitField('Add Item')
+
 
 class EditItemForm(FlaskForm):
     name = StringField('Item Name', validators=[DataRequired()], default = 1)
@@ -59,8 +60,8 @@ class EditItemForm(FlaskForm):
     quantity = IntegerField('Item Quantity', validators=[DataRequired()])
     description = StringField('Brief Description', validators=[DataRequired()])
     category_list = list(Category.query.all())
-    category = SelectField('Category', choices=category_list, default= "Other")
-    is_for_sale = BooleanField("Is for sale?", validators=[DataRequired()])  
+    category = SelectField('Category', choices=category_list, default="Other")
+    is_for_sale = BooleanField("Is for sale?", default=True)
     submit = SubmitField('Edit Item')
 
 

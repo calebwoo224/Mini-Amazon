@@ -2,10 +2,11 @@
 {% block title %}Home{% endblock %}
 {% block content %}
     {% if current_user.is_anonymous %}
-    <h1>Hi, Login to See More</h1>
+        <h1>Login to See More</h1>
     {% else %}
-    <h1>Hi, {{ current_user.username }}!</h1>
+        <h1>Hi, {{ current_user.username }}!</h1>
     {% endif %}
+
     <h2>Recommended Item List</h2>
     {% for cat in ratings %}
     <h3>{{ cat }}</h3>

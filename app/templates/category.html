@@ -1,10 +1,26 @@
 {% extends "base.html" %}
-
+{% block title %}{{ title }}{% endblock %}
 {% block content %}
-<h1>Items In Category</h1>
-
-{% for item in items %}
-<div><a class="action" href="{{ url_for('item', id=item.id) }}">{{ item.name }}</a></div>
-{% endfor %}
-
+    <h1>Items in {{ title }}</h1>
+    <table id="example" class="generic_table">
+        <thead>
+            <tr>
+                <th>Items</th>
+            </tr>
+        </thead>
+    <tbody>
+        {% for item in items %}
+            <tr>
+                <td>
+                    <div><a class="action" href="{{ url_for('item', id=item.id) }}">{{ item.name }}</a></div>
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+    </table>
+    <script>
+        $(document).ready( function () {
+            $('#example').DataTable();
+        } );
+    </script>
 {% endblock %}

@@ -8,14 +8,17 @@ nav h1 { flex: auto; margin: 0; }
 nav h1 a { text-decoration: none; padding: 0.25rem 0.5rem; }
 nav ul { list-style-type: none; margin: 0; padding: 0; overflow: hidden;}
 nav li { float: left;}
-nav ul li a, .dropbtn {
+nav ul li a, .btn btn-default dropdown-toggle {
   display: inline-block;
   color: #000000;
   text-align: center;
   padding: 14px 16px;
   text-decoration: none;
 }
-nav ul li a:hover, .dropdown:hover .dropbtn {
+
+.item_link a:visited, .category_link a:visited {color: blue;}
+
+nav ul li a:hover, .dropdown:hover {
   color: white;
   background-color: darkblue;
 }
@@ -25,11 +28,11 @@ li.dropdown {
 
 .dropdown-content {
   display: none;
-  position: absolute;
+  position: fixed;
   background-color: #f9f9f9;
   min-width: 160px;
   box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-  z-index: 1;
+  z-index: 9999;
     right: 0;
 }
 
@@ -47,23 +50,23 @@ li.dropdown {
   display: block;
 }
 
-.purchases_table {
+.generic_table {
     table-layout: fixed;
     font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
     border-collapse: collapse;
     width: 100%;
 }
 
-.purchases_table td, .purchases_table th {
+.generic_table td, .generic_table th {
   border: 1px solid #ddd;
   padding: 8px;
 }
 
-.purchases_table tr:nth-child(even){background-color: #f2f2f2;}
+.generic_table tr:nth-child(even){background-color: #f2f2f2;}
 
-.purchases_table tr:hover {background-color: #ddd;}
+.generic_table tr:hover {background-color: #ddd;}
 
-.purchases_table th {
+.generic_table th {
   padding-top: 12px;
   padding-bottom: 12px;
   text-align: left;
@@ -71,7 +74,7 @@ li.dropdown {
   color: white;
 }
 
-.purchases_table tr td a, .purchases_table tr td a:visited {color: blue;}
+.generic_table tr td a, .generic_table tr td a:visited {color: blue;}
 
 .flash { margin: 1em 0; padding: 1em; background: #cae6f6; border: 1px solid #377ba8; }
 .content form { margin: 1em 0; display: flex; flex-direction: column; }
