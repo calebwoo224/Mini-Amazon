@@ -17,22 +17,15 @@ from sqlalchemy.sql import func
 def index():
     if current_user.is_authenticated:
         items = Item.query.all()
-        """
-        avg_ratings = {}
-        sorted_ratings = {}
-        all_cats = set([])
-        for item in items:
-            avg_stars = db.session.query(func.avg(Reviews.stars)).filter(Reviews.item_id==item.id).first()
-            if item.category in avg_ratings:
-                avg_ratings[item.category][item.id] = avg_stars[0]
-            else:
-                all_cats.add(item.category)
-                avg_ratings[item.category] = {}
-                avg_ratings[item.category][item.id] = avg_stars[0]
-        for cat in all_cats:
-            sorted_ratings[cat] = {k: v for k, v in sorted(avg_ratings[cat].items(), key=lambda item: item[1], reverse=True)}
-        """
-        return render_template("index.html", title='Home Page', items=items)
+        top_5 = {}
+        names = {}
+        for cat in db.session.query(Item.category, func.count(Item.id)).group_by(Item.category).order_by(func.count(Item.id).desc()).all()[0:5]:
+            top_5[cat[0]] = {}
+            names[cat[0]] = {}
+            for item in Item.query.filter(Item.category==cat[0]).order_by(Item.avg_user_rating.desc()).all()[0:3]:
+                top_5[cat[0]][item.id] = item.avg_user_rating
+                names[cat[0]][item.id] = item.name
+        return render_template("index.html", title='Home Page', items=items, ratings=top_5, names=names)
     else:
         flash("Please login to access the Home Page")
         return redirect(url_for('login'))
@@ -143,6 +136,8 @@ def item(id):
     form = AddtoCart()
     review_form = AddReviewForm()
     update_cart(item, form)
+    avg_rating = Item.query.filter(Item.id==item.id).first().avg_user_rating
+    imagepath = item.category+".jpg"
     if 'cart' in request.form:
         if current_user.is_anonymous:
             flash('To add an item to cart, please login')
@@ -158,7 +153,7 @@ def item(id):
     all_reviews = db.session.query(Reviews, User, Item).join(User,
                                                    (Reviews.user_id == User.id)).join(Item,
                                                    (Reviews.item_id == Item.id)).filter(Reviews.item_id==id).all()
-    return render_template('item.html', item=item, form=form, review_form=review_form, reviews=all_reviews)
+    return render_template('item.html', item=item, form=form, review_form=review_form, reviews=all_reviews, avg_rating=avg_rating, imagepath=imagepath)
 
 
 def update_cart(item, form):
@@ -372,12 +367,6 @@ def seller_summary():
 def sellerItems(seller):
     items = seller.sells.all()
     return items
-
-
-@app.route('/seller_reviews', methods=['GET', 'POST'])
-def seller_reviews():
-    sellers = Seller.query.all()
-    return render_template('seller_reviews.html', title='Seller Reviews', sellers=sellers)
 
 
 @app.route('/<id>/add_seller_review', methods=['GET', 'POST'])

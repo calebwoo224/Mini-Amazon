@@ -4,25 +4,33 @@
 {% block content %}
     <div class="grid-container">
     <div class="item">
+    
         <h2>{{ item.name }}</h2>
-        <p>
-            Price: $
-            <script type="text/javascript">
-                formatPrice({{ item.price }});
-            </script><br>
+
+        <p style="float: left;"><img src="{{url_for('static', filename=imagepath)}}" /></p>
+        
+        <div style = "position:relative;left:30;top:50px;">
+          <p>    
+              Price: $
+              <script type="text/javascript">
+                  formatPrice({{ item.price }});
+              </script><br>
             {% if item.is_for_sale %}
-                Quantity: {{ item.quantity }}<br>
+              Quantity: {{ item.quantity }}<br>
             {% else %}
-                Quantity: 0<br>
+            Quantity: 0<br>
             {% endif %}
-            Seller: {{ item.seller.username }}<br>
-            Category: {{ item.category }}<br>
-            In Stock: {{ item.is_for_sale }}<br>
-            <p>
-                Description:<br>
-                <p>{{ item.description }}</p><br>
-            </p>
-        </p>
+            Average Review: {{ avg_rating }}<br>
+              Seller: <a class="action" href="{{ url_for('add_seller_review', id=item.seller.seller_id) }}">{{ item.seller.username }}</a><br>
+              Category: {{ item.category }}<br>
+              In Stock: {{ item.is_for_sale }}<br>
+              <p>
+                  Description:<br>
+                  <p>{{ item.description }}</p><br>
+              </p>
+          </p>
+        </div>
+
     </div>
     <div class="addtocart">
         <h2>Add to Cart</h2>
