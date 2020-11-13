@@ -137,6 +137,7 @@ def item(id):
     review_form = AddReviewForm()
     update_cart(item, form)
     avg_rating = Item.query.filter(Item.id==item.id).first().avg_user_rating
+    imagepath = item.category+".jpg"
     if 'cart' in request.form:
         if current_user.is_anonymous:
             flash('To add an item to cart, please login')
@@ -152,7 +153,7 @@ def item(id):
     all_reviews = db.session.query(Reviews, User, Item).join(User,
                                                    (Reviews.user_id == User.id)).join(Item,
                                                    (Reviews.item_id == Item.id)).filter(Reviews.item_id==id).all()
-    return render_template('item.html', item=item, form=form, review_form=review_form, reviews=all_reviews, avg_rating=avg_rating)
+    return render_template('item.html', item=item, form=form, review_form=review_form, reviews=all_reviews, avg_rating=avg_rating, imagepath=imagepath)
 
 
 def update_cart(item, form):
