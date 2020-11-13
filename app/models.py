@@ -7,8 +7,10 @@ from app import login
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(20), unique=True)
-    email = db.Column(db.String(120), unique=True)
+    email = db.Column(db.String(120))
     password_hash = db.Column(db.String(128))
+    security_question = db.Column(db.String(250))
+    security_answer = db.Column(db.String(250))
     cart = db.relationship('Cart', backref='user')
     reviews = db.relationship('Reviews', backref='user')
     seller_reviews = db.relationship('SellerReviews', backref='user')
@@ -24,6 +26,12 @@ class User(UserMixin, db.Model):
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
+
+    def set_securityanswer(self, security_answer):
+        self.security_answer = generate_password_hash(security_answer)
+
+    def check_securityanswer(self, security_answer):
+        return check_password_hash(self.security_answer, security_answer)
 
     def add_balance(self, balance):
         self.balance=balance

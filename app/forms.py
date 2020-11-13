@@ -16,6 +16,16 @@ class LoginForm(FlaskForm):
     remember_me = BooleanField('Remember Me')
     submit = SubmitField('Sign In')
 
+class QuestionForm(FlaskForm):
+    securityanswer = StringField('Security Answer', validators=[DataRequired()])
+
+class UsernameForm(FlaskForm):
+    username = StringField('Username', validators=[DataRequired()])
+
+class PasswordForm(FlaskForm):
+    password = PasswordField('Password', validators=[DataRequired()])
+    password2 = PasswordField(
+        'Repeat Password', validators=[DataRequired(), EqualTo('password')])
 
 class RegistrationForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])
@@ -23,6 +33,9 @@ class RegistrationForm(FlaskForm):
     password = PasswordField('Password', validators=[DataRequired()])
     password2 = PasswordField(
         'Repeat Password', validators=[DataRequired(), EqualTo('password')])
+    securityquestion = StringField('Security Question', validators=[DataRequired()])
+    securityanswer = StringField('Security Answer', validators=[DataRequired()])
+    is_seller= BooleanField("Register as seller?", default=False) 
     submit = SubmitField('Register')
 
     def validate_username(self, username):
@@ -35,11 +48,6 @@ class RegistrationForm(FlaskForm):
         if user is not None:
             raise ValidationError('Please use a different email address.')
 
-
-class EditProfileForm(FlaskForm):
-    username = StringField('New username', validators=[DataRequired()])
-    password = StringField('New password', validators=[DataRequired()])
-    submit = SubmitField('Submit')
 
 
 class AddItemForm(FlaskForm):
