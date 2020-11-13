@@ -15,7 +15,8 @@
                   formatPrice({{ item.price }});
               </script><br>
               Quantity: {{ item.quantity }}<br>
-              Seller: {{ item.seller.username }}<br>
+            Average Review: {{ avg_rating }}<br>
+              Seller: <a class="action" href="{{ url_for('add_seller_review', id=item.seller.seller_id) }}">{{ item.seller.username }}</a><br>
               Category: {{ item.category }}<br>
               In Stock: {{ item.is_for_sale }}<br>
               <p>

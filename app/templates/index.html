@@ -6,6 +6,14 @@
     {% else %}
     <h1>Hi, {{ current_user.username }}!</h1>
     {% endif %}
+    <h2>Recommended Item List</h2>
+    {% for cat in ratings %}
+    <h3>{{ cat }}</h3>
+    {% for key in ratings[cat] %}
+    <div><a class="action" href="{{ url_for('item', id=key) }}">{{ names[cat][key] }}</a>; Average Review: {{ ratings[cat][key] }}</div>
+    {% endfor %}
+    {% endfor %}
+    <h2>All Items</h2>
     {% for item in items %}
     <div><a class="action" href="{{ url_for('item', id=item.id) }}">{{ item.name }}</a></div>
     {% endfor %}

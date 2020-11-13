@@ -5,8 +5,8 @@ from app.models import User, Item, Reviews, Seller, OrderHistory, SellerReviews,
 from datetime import datetime
 import random
 import string
+from sqlalchemy.sql import func
 #from google_images_search import GoogleImagesSearch
-
 
 
 def Load_Data(file_name):
@@ -33,7 +33,6 @@ def item_init(dic):
     
     #gis = GoogleImagesSearch('Null', 'Null')
     i = 0
-    categories = ['cat1', 'cat2', 'cat3']
     catz = []
     for key in dic['name']:
         seller = Seller.query.filter_by(username=dic['merchant_id'][key]).first()
@@ -53,9 +52,22 @@ def item_init(dic):
             i += 1
             toAdd.set_password('123')
             db.session.add(toAdd)
-        item = Item(name=dic['name'][key], price=dic['price'][key],
+        item = Item(id=key,name=dic['name'][key], price=dic['price'][key],
                     quantity=dic['quantity'][key], description=dic['description'][key],
                     seller=Seller.query.filter_by(username=dic['merchant_id'][key]).first(), category=cat)
+        date = '' + str(datetime.now().month) + '/' + str(datetime.now().day) + '/' + str(datetime.now().year)
+        location = ['USA', 'Canada', 'United Kingdom', 'China', 'Japan']
+        stars = [1, 2, 3, 4, 5]
+        user_id = []
+        for user in User.query.all():
+            user_id.append(user.id)
+        for i in range(5):
+            review = Reviews(user_id=random.choice(user_id), item_id=item.id, date_time=date,
+                             location=random.choice(location),
+                             stars=random.choice(stars), content=get_random_string(10))
+            db.session.add(review)
+        avg_stars = db.session.query(func.avg(Reviews.stars)).filter(Reviews.item_id==item.id).first()
+        item.avg_user_rating = avg_stars[0]
         db.session.add(item)
     #for name in catz:
         #_search_params = {
@@ -93,7 +105,6 @@ def seed_db():
     db.session.add(seller2)
     db.session.commit()
 
-
     item = Item(name='pens', price=3.00, quantity=30, seller=seller1)
     db.session.add(item)
     item2 = Item(name='books', price=0.90, quantity=400, seller=seller2)
@@ -107,22 +118,6 @@ def seed_db():
     item6 = Item(name='Pencil', price=.99, quantity=2, seller=seller1)
     db.session.add(item6)
     db.session.commit()
-    
-
-    date = '' + str(datetime.now().month) + '/' + str(datetime.now().day) + '/' + str(datetime.now().year)
-    location = ['USA', 'Canada', 'United Kingdom', 'China', 'Japan']
-    stars = [1, 2, 3, 4, 5]
-    user_id = []
-    for user in User.query.all():
-        user_id.append(user.id)
-    for item in Item.query.all():
-        for i in range(5):
-            review = Reviews(user_id=random.choice(user_id), item_id=item.id, date_time=date,
-                             location=random.choice(location),
-                             stars=random.choice(stars), content=get_random_string(10))
-            db.session.add(review)
-    db.session.commit()
-
 
 if __name__ == '__main__':
     seed_db()
