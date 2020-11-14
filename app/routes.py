@@ -19,13 +19,16 @@ def index():
         items = Item.query.all()
         top_5 = {}
         names = {}
+        images = {}
         for cat in db.session.query(Item.category, func.count(Item.id)).group_by(Item.category).order_by(func.count(Item.id).desc()).all()[0:5]:
             top_5[cat[0]] = {}
             names[cat[0]] = {}
-            for item in Item.query.filter(Item.category==cat[0]).order_by(Item.avg_user_rating.desc()).all()[0:3]:
+            images[cat[0]] = {}
+            for item in Item.query.filter(Item.category == cat[0]).order_by(Item.avg_user_rating.desc()).all()[0:3]:
                 top_5[cat[0]][item.id] = item.avg_user_rating
                 names[cat[0]][item.id] = item.name
-        return render_template("index.html", title='Home Page', items=items, ratings=top_5, names=names)
+                images[cat[0]][item.id] = item.category + ".jpg"
+        return render_template("index.html", title='Home Page', items=items, ratings=top_5, names=names, images=images)
     else:
         flash("Please login to access the Home Page")
         return redirect(url_for('login'))
@@ -96,11 +99,11 @@ def edit_profile():
 def add_item():
     form = AddItemForm()
     if form.validate_on_submit():
-        item = Item(name=form.name.data, price=form.price.data, quantity=form.quantity.data, seller = current_user,
-                    category = form.category.data, description = form.description.data, is_for_sale = form.is_for_sale.data)
+        item = Item(name=form.name.data, price=form.price.data, quantity=form.quantity.data, seller=current_user,
+                    category=form.category.data, description=form.description.data, is_for_sale=form.is_for_sale.data)
         db.session.add(item)
         db.session.commit()
-        return redirect(url_for('index'))
+        return redirect(url_for('seller_summary', ))
     return render_template('add_item.html', title='Add Item', form=form)
 
 
@@ -127,7 +130,6 @@ def edit_item(id):
         flash('Your changes have been saved.')
         return redirect(url_for('seller_summary'))
     return render_template('edit_item.html', title='Edit Item', form=form)
-
 
 
 @app.route('/<id>/item', methods=['GET', 'POST'])
@@ -212,7 +214,9 @@ def cart():
     cart_items = db.session.query(Cart, Item).join(Item,
                                                    (Cart.item_id == Item.id)).filter(Cart.buyer_id ==
                                                                                      current_user.id).all()
+    cart_items_with_images = []
     for i in cart_items:
+        cart_items_with_images.append((i, i.Item.category+".jpg"))
         if i.Item.quantity < i.Cart.cart_quantity or i.Item.is_for_sale is False:  # not enough anymore
             flash("Item {} no longer in stock in the quantity desired. "
                   "Your cart quantity was changed to 0".format(i.Item.name))
@@ -228,7 +232,7 @@ def cart():
                 i.Cart.cart_quantity = 0
                 db.session.commit()
         return checkout(current_user.id)
-    return render_template('cart.html', cart=cart_items, price=price)
+    return render_template('cart.html', cart=cart_items_with_images, price=price)
 
 
 @app.route('/edit_cart_quantity', methods=['GET', 'POST'])
