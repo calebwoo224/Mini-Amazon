@@ -19,6 +19,7 @@
 </head>
 
 <nav>
+<img width="30"  src="{{url_for('static', filename="cart.png")}}" />
     <h1>Mini-Amazon</h1>
     <ul>
         <li><a href="{{ url_for('index') }}">Home</a></li>
@@ -26,7 +27,8 @@
         {% if current_user.is_anonymous %}
             <li><a href="{{ url_for('login') }}">Login</a></li>
         {% else %}
-            <li><a href="{{ url_for('cart') }}">Cart</a></li>
+            <li><a href="{{ url_for('cart') }}">Cart</a>
+                </li>
             <li class="dropdown">
                 <a class="dropbtn">{{ current_user.username }}</a>
                 <div class="dropdown-content">

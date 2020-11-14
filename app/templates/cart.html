@@ -15,16 +15,17 @@
         {% for item in cart %}
             <tr>
                 <td></td>
-                <td><div><a class="action" href="{{ url_for('item', id=item.Item.id) }}">{{ item.Item.name }}</a></div></td>
+                <td><div><a class="action" href="{{ url_for('item', id=item[0].Item.id) }}">{{ item[0].Item.name }}</a></div>
+                    <img width="30%" height="30%" src="{{url_for('static', filename=item[1])}}" /></td>
                 <td><p>
-                    <button onclick='change({{ item.Cart.cart_quantity|tojson }}, {{ item.Item.id|tojson }}, 0)'>-</button>
-                    {{ item.Cart.cart_quantity }}
-                    <button onclick='change({{ item.Cart.cart_quantity|tojson }}, {{ item.Item.id|tojson }}, 1)'>+</button></p>
-                    <a class="action" href="{{ url_for('delete_from_cart', item_id=item.Item.id) }}">Delete</a>
+                    <button onclick='change({{ item[0].Cart.cart_quantity|tojson }}, {{ item[0].Item.id|tojson }}, 0)'>-</button>
+                    {{ item[0].Cart.cart_quantity }}
+                    <button onclick='change({{ item[0].Cart.cart_quantity|tojson }}, {{ item[0].Item.id|tojson }}, 1)'>+</button></p>
+                    <a class="action" href="{{ url_for('delete_from_cart', item_id=item[0].Item.id) }}">Delete</a>
                 </td>
                 <td id="price">$
                     <script type="text/javascript">
-                        var StringValue = parseFloat({{ item.Item.price|tojson }});
+                        var StringValue = parseFloat({{ item[0].Item.price|tojson }});
                         document.write(StringValue.toFixed( 2 ));
                     </script>
                 </td>

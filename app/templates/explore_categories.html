@@ -2,10 +2,13 @@
 {% block title %}Categories{% endblock %}
 {% block content %}
     <h1>All Categories</h1>
-    <table class="generic_table">
+    <table id="example" class="generic_table">
+    <thead>
         <tr>
             <th>Categories</th>
         </tr>
+        </thead>
+    <tbody>
         {% for category in categories %}
             <tr>
                 <td>
@@ -13,6 +16,12 @@
                 </td>
             </tr>
         {% endfor %}
+    </tbody>
     </table>
+    <script>
+        $(document).ready( function () {
+            $('#example').DataTable();
+        } );
+    </script>
 
 {% endblock %}

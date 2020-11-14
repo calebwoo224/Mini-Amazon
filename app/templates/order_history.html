@@ -4,25 +4,24 @@
     <h1>Order History</h1>
     {% for order in history %}
     <h3>Purchase Date: {{ order["datetime"] }}</h3>
-    <table class="purchases_table">
-        <tr>
-            <th>Item</th>
-            <th>Price</th>
-            <th>Quantity</th>
-            <th>Seller</th>
-        </tr>
+    <table class="generic_table">
+    <thead>
+
+    </thead>
+    <tbody>
     {% for purchase in order["orders"] %}
         <tr>
             <td><div><a class="action" href="{{ url_for('item', id=purchase.Item.id) }}">{{ purchase.Item.name }}</a></div></td>
-            <td>$
+            <td>Price: $
                 <script type="text/javascript">
                     formatPrice({{ purchase.OrderHistory.price_sold }});
                 </script>
             </td>
-            <td>{{ purchase.OrderHistory.quantity_sold }}</td>
-            <td>{{ purchase.Seller.username }}</td>
+            <td>Quantity Purchased: {{ purchase.OrderHistory.quantity_sold }}</td>
+            <td>Seller: <a class="action" href="{{ url_for('add_seller_review', id=purchase.Seller.id) }}">{{ purchase.Seller.username }}</a></td>
         </tr>
     {% endfor %}
+    </tbody>
     </table>
     {% endfor %}
 
