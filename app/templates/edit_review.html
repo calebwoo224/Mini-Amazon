@@ -26,6 +26,9 @@
                 <span style="color: red;">[{{ error }}]</span>
             {% endfor %}
         </p>
-        <p>{{ form.submit() }}</p>
+        <input type='submit' name='edit' value='Finished'>
+    </form>
+    <form action="" method="post" novalidate>
+        <input type='submit' name='delete' value='Delete'>
     </form>
 {% endblock %}

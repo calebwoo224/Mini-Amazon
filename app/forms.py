@@ -98,7 +98,7 @@ class EditReviewForm(FlaskForm):
     location = StringField('Location')
     stars = IntegerField('Stars', validators=[DataRequired()])
     content = TextAreaField('Write your review:', validators=[DataRequired()])
-    submit = SubmitField('Finished')
+    #submit = SubmitField('Finished')
 
 
 class EditBalance(FlaskForm):

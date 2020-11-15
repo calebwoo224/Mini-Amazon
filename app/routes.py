@@ -198,6 +198,9 @@ def edit_item(id):
 @app.route('/<id>/item', methods=['GET', 'POST'])
 def item(id):
     item = get_item(id)
+    avg_stars = db.session.query(func.avg(Reviews.stars)).filter(Reviews.item_id==item.id).first()
+    item.avg_user_rating = avg_stars[0]
+    db.session.commit()
     form = AddtoCart()
     review_form = AddReviewForm()
     update_cart(item, form)
@@ -270,17 +273,34 @@ def add_to_cart(id, quantity):
 
 @app.route('/edit_review/<item_id>/<content>', methods=['GET', 'POST'])
 def edit_review(item_id, content):
+    date = '' + str(datetime.now().month) + '/' + str(datetime.now().day) + '/' + str(datetime.now().year)
     re = Reviews.query.filter_by(user_id=current_user.id, item_id=item_id, content=content).first()
     item = Item.query.filter_by(id=item_id).first()
     if re is None:
         return redirect(url_for('item', id=item_id))
     form = EditReviewForm(obj=re)
-    if form.validate_on_submit():
+    if 'delete' in request.form:
+        db.session.delete(re)
+        db.session.commit()
+        flash('You have deleted this review.')
+        logging.info("User (id: {}, username: {}) deleted review for Item (id: {}, name: {}) on {}".format(current_user.id, current_user.username, item.id, item.name, date))
+        return redirect(url_for('item', id=item_id))
+    if 'edit' in request.form:
+        stars = form.stars.data
+        try:
+            stars = int(stars)
+        except TypeError:
+            flash("Cannot add a non-numeric value to stars")
+            return redirect(url_for('edit_review', item_id=item_id, content=content))
+        if stars < 1 or stars > 5:
+            flash("Cannot add a star rating outside of 1-5")
+            return redirect(url_for('edit_review', item_id=item_id, content=content))
         re.location = form.location.data
         re.stars = form.stars.data
         re.content = form.content.data
         db.session.commit()
         flash('Your changes have been saved.')
+        logging.info("User (id: {}, username: {}) edited review for Item (id: {}, name: {}) on {}".format(current_user.id, current_user.username, item.id, item.name, date))
         return redirect(url_for('item', id=item_id))
     return render_template('edit_review.html', title='Edit Review', form=form, name=item.name)
 
@@ -291,7 +311,6 @@ def add_review(id, name, date, location, stars, content):
     db.session.add(review)
     db.session.commit()
     flash('Successfully added review for item {}'.format(name))
-    return redirect(url_for('item', id=id))
 
 
 @app.route('/<item_id>/delete_from_cart', methods=['GET', 'POST'])
