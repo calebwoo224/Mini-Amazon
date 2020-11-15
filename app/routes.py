@@ -3,7 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from app import app
 from app import db
 from app.forms import LoginForm, AddItemForm, AddtoCart, AddReviewForm, AddSellerReviewForm, EditBalance, RegistrationForm, EditItemForm
-from app.forms import QuestionForm, UsernameForm, PasswordForm
+from app.forms import QuestionForm, UsernameForm, PasswordForm, EditReviewForm
 from flask_login import current_user, login_user, logout_user, login_required
 import logging
 from app.models import User, Item, Cart, Reviews, OrderHistory, Seller, SellerReviews, Category
@@ -186,7 +186,7 @@ def edit_item(id):
         item.price = form.price.data
         item.quantity = form.quantity.data
         item.seller = current_user
-        item.catagory = form.category.data
+        item.category = form.category.data
         item.description = form.description.data
         item.is_for_sale = form.is_for_sale.data
         db.session.commit()
@@ -259,9 +259,26 @@ def add_to_cart(id, quantity):
     return redirect(url_for('item', id=id))
 
 
+@app.route('/edit_review/<item_id>/<content>', methods=['GET', 'POST'])
+def edit_review(item_id, content):
+    re = Reviews.query.filter_by(user_id=current_user.id, item_id=item_id, content=content).first()
+    item = Item.query.filter_by(id=item_id).first()
+    if re is None:
+        return redirect(url_for('item', id=item_id))
+    form = EditReviewForm(obj=re)
+    if form.validate_on_submit():
+        re.location = form.location.data
+        re.stars = form.stars.data
+        re.content = form.content.data
+        db.session.commit()
+        flash('Your changes have been saved.')
+        return redirect(url_for('item', id=item_id))
+    return render_template('edit_review.html', title='Edit Review', form=form, name=item.name)
+
+
 def add_review(id, name, date, location, stars, content):
-    review = Reviews(user_id=current_user.id, item_id=id, date_time=date, 
-    location=location, stars=stars, content=content)
+    review = Reviews(user_id=current_user.id, item_id=id, date_time=date,
+                     location=location, stars=stars, content=content)
     db.session.add(review)
     db.session.commit()
     flash('Successfully added review for item {}'.format(name))
