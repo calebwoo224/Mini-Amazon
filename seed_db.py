@@ -17,21 +17,28 @@ def Load_Data(file_name):
 
 def user_init(dic):
     for key in dic['username']:
-        user = User(username=dic['username'][key], email=dic['email'][key])
+        question = "Favorite Color?"
+        answer = "blue"
+        user = User(username=dic['username'][key], email=dic['email'][key],
+                    security_question=question)
         user.set_password(str(dic['password'][key]))
+        user.set_securityanswer(answer)
         db.session.add(user)
 
 
 def seller_init(dic):
     for key in dic['username']:
-        seller = Seller(username=dic['username'][key], email=dic['email'][key])
+        question = "Favorite Color?"
+        answer = "blue"
+        seller = Seller(username=dic['username'][key], email=dic['email'][key],
+                        security_question=question)
         seller.set_password(str(dic['password'][key]))
+        seller.set_securityanswer(answer)
         db.session.add(seller)
 
 
 def item_init(dic):
-    
-    #gis = GoogleImagesSearch('Null', 'Null')
+    # gis = GoogleImagesSearch('Null', 'Null')
     i = 0
     catz = []
     for key in dic['name']:
@@ -48,11 +55,12 @@ def item_init(dic):
               db.session.add(toAdd)
               catz.append(cat)
         if not seller:
-            toAdd = Seller(username=str(dic['merchant_id'][key]), email=str(dic['merchant_id'][key]) + str(i) + "@NULL")
+            toAdd = Seller(username=str(dic['merchant_id'][key]),
+                           email=str(dic['merchant_id'][key]) + str(i) + "@NULL")
             i += 1
             toAdd.set_password('123')
             db.session.add(toAdd)
-        item = Item(id=key,name=dic['name'][key], price=dic['price'][key],
+        item = Item(id=key, name=dic['name'][key], price=dic['price'][key],
                     quantity=dic['quantity'][key], description=dic['description'][key],
                     seller=Seller.query.filter_by(username=dic['merchant_id'][key]).first(), category=cat)
         date = '' + str(datetime.now().month) + '/' + str(datetime.now().day) + '/' + str(datetime.now().year)

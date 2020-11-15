@@ -1,5 +1,6 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, DecimalField, IntegerField, SelectField, TextField
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, DecimalField
+from wtforms import IntegerField, SelectField, TextField, TextAreaField
 from wtforms.validators import Length
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo
 from app.models import User
@@ -16,16 +17,20 @@ class LoginForm(FlaskForm):
     remember_me = BooleanField('Remember Me')
     submit = SubmitField('Sign In')
 
+
 class QuestionForm(FlaskForm):
     securityanswer = StringField('Security Answer', validators=[DataRequired()])
 
+
 class UsernameForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])
+
 
 class PasswordForm(FlaskForm):
     password = PasswordField('Password', validators=[DataRequired()])
     password2 = PasswordField(
         'Repeat Password', validators=[DataRequired(), EqualTo('password')])
+
 
 class RegistrationForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])
@@ -47,7 +52,6 @@ class RegistrationForm(FlaskForm):
         user = User.query.filter_by(email=email.data).first()
         if user is not None:
             raise ValidationError('Please use a different email address.')
-
 
 
 class AddItemForm(FlaskForm):
@@ -81,13 +85,13 @@ class AddtoCart(FlaskForm):
 class AddReviewForm(FlaskForm):
     location = StringField('Location')
     stars = IntegerField('Stars', validators=[DataRequired()])
-    content = TextField('Write your review:', validators=[DataRequired()])
+    content = TextAreaField('Write your review:', validators=[DataRequired()])
 
 
 class AddSellerReviewForm(FlaskForm):
     location = StringField('Location')
     stars = IntegerField('Stars', validators=[DataRequired()])
-    content = TextField('Write your review:', validators=[DataRequired()])
+    content = TextAreaField('Write your review:', validators=[DataRequired()])
 
 
 class EditBalance(FlaskForm):

@@ -2,6 +2,9 @@
 {% block title %}Order History{% endblock %}
 {% block content %}
     <h1>Order History</h1>
+    {% if not has_history %}
+        <p>You have not purchased any items.</p>
+    {% endif %}
     {% for order in history %}
     <h3>Purchase Date: {{ order["datetime"] }}</h3>
     <table class="generic_table">
