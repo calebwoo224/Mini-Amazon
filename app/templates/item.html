@@ -51,30 +51,33 @@
     {% if reviews | length == 0 %}
     <h3>There are no reviews for this item</h3>
     {% else %}
-    <table>
-        <tr>
-            <th>Reviewer</th>
-            <th>Date</th>
-            <th>Location</th>
-            <th>Stars</th>
-            <th>Content</th>
-            <th></th>
-        </tr>
-        {% for review in reviews %}
-        <tr>
-            <td>{{ review.User.username }}</td>
-            <td>{{ review.Reviews.date_time }}</td>
-            <td>{{ review.Reviews.location }}</td>
-            <td>{{ review.Reviews.stars }}</td>
-            <td>{{ review.Reviews.content }}</td>
-            {% if review.User.id == current_user.id %}
-            <td><a class="action" href="{{ url_for('edit_review', item_id=item.id, content=review.Reviews.content) }}">Edit</a></td>
-            {% else %}
-            <td></td>
-            {% endif %}
-        </tr>
-        {% endfor %}
+    <table id="example" class="generic_table">
+        <thead>
+            <tr>
+                <th>Reviewer</th>
+                <th>Date</th>
+                <th>Location</th>
+                <th>Stars</th>
+                <th>Content</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for review in reviews %}
+            <tr>
+                <td>{{ review.User.username }}</td>
+                <td>{{ review.Reviews.date_time }}</td>
+                <td>{{ review.Reviews.location }}</td>
+                <td>{{ review.Reviews.stars }}</td>
+                <td>{{ review.Reviews.content }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
     </table>
+    <script>
+        $(document).ready(function () {
+            $('#example').DataTable();
+        });
+    </script>
     {% endif %}
         </table>
         <h2>Write a review</h2>

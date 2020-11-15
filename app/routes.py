@@ -212,6 +212,15 @@ def item(id):
             return redirect(url_for('item', id=id))
         add_to_cart(item.id, form.item_quantity.data)
     if 'review' in request.form:
+        stars = review_form.stars.data
+        try:
+            stars = int(stars)
+        except TypeError:
+            flash("Cannot add a non-numeric value to stars")
+            return redirect(url_for('item', id=id))
+        if stars < 1 or stars > 5:
+            flash("Cannot add a star rating outside of 1-5")
+            return redirect(url_for('item', id=id))
         date = '' + str(datetime.now().month) + '/' + str(datetime.now().day) + '/' + str(datetime.now().year)
         re = Reviews.query.filter_by(user_id=current_user.id, item_id=item.id, content=review_form.content.data).first()
         if re is not None:
@@ -470,6 +479,15 @@ def add_seller_review(id):
     seller = Seller.query.filter_by(seller_id=id).first()
     form = AddSellerReviewForm()
     if 'review' in request.form:
+        stars = form.stars.data
+        try:
+            stars = int(stars)
+        except TypeError:
+            flash("Cannot add a non-numeric value to stars")
+            return redirect(url_for('add_seller_review', id=id))
+        if stars < 1 or stars > 5:
+            flash("Cannot add a star rating outside of 1-5")
+            return redirect(url_for('add_seller_review', id=id))
         date = '' + str(datetime.now().month) + '/' + str(datetime.now().day) + '/' + str(datetime.now().year)
         s_re = SellerReviews.query.filter_by(user_id=current_user.id, item_id=item.id,
                                              content=form.content.data).first()
