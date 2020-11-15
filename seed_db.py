@@ -6,7 +6,7 @@ from datetime import datetime
 import random
 import string
 from sqlalchemy.sql import func
-#from google_images_search import GoogleImagesSearch
+
 
 
 def Load_Data(file_name):
@@ -38,7 +38,6 @@ def seller_init(dic):
 
 
 def item_init(dic):
-    # gis = GoogleImagesSearch('Null', 'Null')
     i = 0
     catz = []
     for key in dic['name']:
@@ -98,7 +97,8 @@ def get_random_string(length):
 def seed_db():
     db.drop_all()
     db.create_all()
-
+    name = "Other"
+    
     user_init(Load_Data('initTables/User.csv'))
     seller_init(Load_Data('initTables/Seller.csv'))
     db.session.commit()
@@ -125,6 +125,7 @@ def seed_db():
     db.session.add(item5)
     item6 = Item(name='Pencil', price=.99, quantity=2, seller=seller1)
     db.session.add(item6)
+    
     db.session.commit()
 
 if __name__ == '__main__':
