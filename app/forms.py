@@ -67,7 +67,7 @@ class AddItemForm(FlaskForm):
 
 
 class EditItemForm(FlaskForm):
-    name = StringField('Item Name', validators=[DataRequired()], default = 1)
+    name = StringField('Item Name', validators=[DataRequired()], default=1)
     price = DecimalField('Item Price', validators=[DataRequired()], places=2)
     quantity = IntegerField('Item Quantity', validators=[DataRequired()])
     description = StringField('Brief Description', validators=[DataRequired()])
@@ -94,6 +94,12 @@ class AddSellerReviewForm(FlaskForm):
     content = TextAreaField('Write your review:', validators=[DataRequired()])
 
 
+class EditReviewForm(FlaskForm):
+    location = StringField('Location')
+    stars = IntegerField('Stars', validators=[DataRequired()])
+    content = TextAreaField('Write your review:', validators=[DataRequired()])
+    submit = SubmitField('Finished')
+
+
 class EditBalance(FlaskForm):
     newbalance = DecimalField('Amount', validators=[DataRequired()], places=2)
-

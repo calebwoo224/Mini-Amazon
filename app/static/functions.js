@@ -49,7 +49,3 @@ function formatPrice(price) {
     document.write(StringValue.toFixed( 2 ));
 }
 
-
-$(document).ready( function () {
-    $('#myTable').DataTable();
-} );
