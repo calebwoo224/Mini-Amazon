@@ -1,10 +1,16 @@
 {% extends "base.html" %}
-
+{% block title %}Profile{% endblock %}
 {% block content %}
-    <h1>Username: {{ user.username }}</h1>
-    <h1>Email: {{ user.email}}</h1>
-    <h1>Balance: {{user.balance}}</h1>
-    <hr>
+    <div class="center">
+        <h2>User Profile</h2>
+        Username: {{ user.username }}<br>
+        Email: {{ user.email}}<br>
+        Balance: $<script type="text/javascript">
+        formatPrice({{user.balance}});
+    </script><br>
+        <a href="{{ url_for('order_history', user_id=current_user.id) }}">See your Order History</a><br>
+        <a href="{{ url_for('balance') }}">Edit your Current Balance</a><br>
+    </div>
     
 {% endblock %}
 

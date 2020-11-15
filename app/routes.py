@@ -146,11 +146,16 @@ def register():
     return render_template('register.html', title='Register', form=form)
 
 
-
 @app.route('/add_item', methods=['GET', 'POST'])
 def add_item():
     form = AddItemForm()
     if form.validate_on_submit():
+        if form.price.data < 0:
+            flash("Cannot choose a negative price. Please try again")
+            return redirect(url_for('add_item'))
+        if form.quantity.data < 0:
+            flash("Cannot choose a negative quantity. Please try again")
+            return redirect(url_for('add_item'))
         item = Item(name=form.name.data, price=form.price.data, quantity=form.quantity.data, seller=current_user,
                     category=form.category.data, description=form.description.data, is_for_sale=form.is_for_sale.data)
         db.session.add(item)
@@ -171,6 +176,12 @@ def edit_item(id):
     item = get_item(id)
     form = EditItemForm(obj=item)
     if form.validate_on_submit():
+        if form.price.data < 0:
+            flash("Cannot choose a negative price. Please try again")
+            return redirect(url_for('edit_item', id=id))
+        if form.quantity.data < 0:
+            flash("Cannot choose a negative quantity. Please try again")
+            return redirect(url_for('edit_item', id=id))
         item.name = form.name.data
         item.price = form.price.data
         item.quantity = form.quantity.data
@@ -202,8 +213,13 @@ def item(id):
         add_to_cart(item.id, form.item_quantity.data)
     if 'review' in request.form:
         date = '' + str(datetime.now().month) + '/' + str(datetime.now().day) + '/' + str(datetime.now().year)
+        re = Reviews.query.filter_by(user_id=current_user.id, item_id=item.id, content=review_form.content.data).first()
+        if re is not None:
+            flash("You already left this review. Change the content.")
+            return redirect(url_for('item', id=id))
         add_review(item.id, item.name, date, review_form.location.data, review_form.stars.data, review_form.content.data)
         logging.info("User (id: {}, username: {}) added review for Item (id: {}, name: {}) on {}".format(current_user.id, current_user.username, item.id, item.name, date))
+        return redirect(url_for('item', id=item.id))
     all_reviews = db.session.query(Reviews, User, Item).join(User,
                                                    (Reviews.user_id == User.id)).join(Item,
                                                    (Reviews.item_id == Item.id)).filter(Reviews.item_id==id).all()
@@ -379,7 +395,11 @@ def order_history(user_id):
                                                                              Seller.id)).filter(OrderHistory.buyer_id ==
                                                                                                 user_id).order_by(desc(OrderHistory.datetime)).all()
     orders = get_orders_by_time(u_history)
-    return render_template('order_history.html', history=orders) 
+    if len(orders) == 0:
+        has_history = False
+    else:
+        has_history = True
+    return render_template('order_history.html', history=orders, has_history=has_history)
 
 
 @app.route('/<seller_id>/trade_history', methods=['GET', "POST"])
@@ -390,8 +410,11 @@ def trade_history(seller_id):
                                                                     OrderHistory.item_id == Item.id,
                                                                     OrderHistory.seller_id == seller_id).order_by(desc(OrderHistory.datetime)).all()
     orders = get_orders_by_time(s_history)
-
-    return render_template('trade_history.html', history=orders)
+    if len(orders) == 0:
+        has_history = False
+    else:
+        has_history = True
+    return render_template('trade_history.html', history=orders, has_history=has_history)
 
 
 def get_orders_by_time(history):
@@ -431,10 +454,16 @@ def add_seller_review(id):
     form = AddSellerReviewForm()
     if 'review' in request.form:
         date = '' + str(datetime.now().month) + '/' + str(datetime.now().day) + '/' + str(datetime.now().year)
+        s_re = SellerReviews.query.filter_by(user_id=current_user.id, item_id=item.id,
+                                             content=form.content.data).first()
+        if s_re is not None:
+            flash("You already left this review. Change the content.")
+            return redirect(url_for('add_seller_review', id=id))
         add_s_review(seller.seller_id, seller.username, date, form.location.data, form.stars.data, form.content.data)
         logging.info("User (id: {}, username: {}) added review for "
                      "Seller (id: {}, username: {}) on {}".format(current_user.id, current_user.username,
                                                                   seller.seller_id, seller.username, date))
+        return redirect(url_for('add_seller_review', id=id))
     all_reviews = db.session.query(SellerReviews, User, Seller).join(User,
                                                    (SellerReviews.user_id == User.id)).join(Seller,
                                                    (SellerReviews.seller_id == Seller.id)).filter(SellerReviews.seller_id==id).all()

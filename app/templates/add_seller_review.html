@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>{{ seller.username }}</h1>
+    <h1>Seller: {{ seller.username }}</h1>
     <h2>Reviews</h2>
     {% if reviews | length == 0 %}
     <h3>There are no reviews for this seller</h3>
@@ -44,7 +44,7 @@
         </p>
         <p>
             {{ form.content.label }}<br>
-            {{ form.content(size=32) }}<br>
+            {{ form.content(rows='5', cols='35') }}<br>
             {% for error in form.content.errors %}
             <span style="color: red;">[{{ error }}]</span>
             {% endfor %}
