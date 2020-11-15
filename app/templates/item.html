@@ -59,6 +59,7 @@
                 <th>Location</th>
                 <th>Stars</th>
                 <th>Content</th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
@@ -69,6 +70,11 @@
                 <td>{{ review.Reviews.location }}</td>
                 <td>{{ review.Reviews.stars }}</td>
                 <td>{{ review.Reviews.content }}</td>
+                {% if  review.User.id == current_user.id %}
+                <td><a class="action" href="{{ url_for('edit_review', item_id=item.id, content=review.Reviews.content) }}">Edit</a></td>
+                {% else %}
+                <td></td>
+                {% endif %}
             </tr>
             {% endfor %}
         </tbody>
