@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Forget Password{% endblock %}
+{% block content %}
+
+<div class="securityquestion">
+    <h3>Answer Your Security Question</h3>
+    <form action="" method="post" novalidate>
+        {{ question_form.hidden_tag() }}
+        <p>
+            Question: {{question}}<br>
+            {{ question_form.securityanswer.label }}
+            {{ question_form.securityanswer }}<br>
+            {% for error in question_form.securityanswer.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <input type='submit' name='answer' value='Submit'>
+    </form>
+</div>
+    
+    
+{% endblock %}

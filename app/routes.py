@@ -3,7 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from app import app
 from app import db
 from app.forms import LoginForm, AddItemForm, AddtoCart, AddReviewForm, AddSellerReviewForm, EditBalance, RegistrationForm, EditItemForm
-from app.forms import EditProfileForm
+from app.forms import QuestionForm, UsernameForm, PasswordForm, EditReviewForm
 from flask_login import current_user, login_user, logout_user, login_required
 import logging
 from app.models import User, Item, Cart, Reviews, OrderHistory, Seller, SellerReviews, Category
@@ -19,13 +19,16 @@ def index():
         items = Item.query.all()
         top_5 = {}
         names = {}
+        images = {}
         for cat in db.session.query(Item.category, func.count(Item.id)).group_by(Item.category).order_by(func.count(Item.id).desc()).all()[0:5]:
             top_5[cat[0]] = {}
             names[cat[0]] = {}
-            for item in Item.query.filter(Item.category==cat[0]).order_by(Item.avg_user_rating.desc()).all()[0:3]:
+            images[cat[0]] = {}
+            for item in Item.query.filter(Item.category == cat[0]).order_by(Item.avg_user_rating.desc()).all()[0:3]:
                 top_5[cat[0]][item.id] = item.avg_user_rating
                 names[cat[0]][item.id] = item.name
-        return render_template("index.html", title='Home Page', items=items, ratings=top_5, names=names)
+                images[cat[0]][item.id] = item.category + ".jpg"
+        return render_template("index.html", title='Home Page', items=items, ratings=top_5, names=names, images=images)
     else:
         flash("Please login to access the Home Page")
         return redirect(url_for('login'))
@@ -45,6 +48,57 @@ def login():
         login_user(user, remember=form.remember_me.data)
         return redirect(url_for('index'))
     return render_template('login.html', title='Sign In', form=form)
+
+
+@app.route('/getusername', methods=['GET', 'POST'])
+def getusername():
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
+    username_form = UsernameForm()
+    if 'name' in request.form:
+        user = User.query.filter_by(username=username_form.username.data).first()
+        if user is None:
+            flash('User does not exist')
+            return redirect(url_for('getusername'))
+        # question= user.security_question
+        return redirect(url_for('answerquestion', uid=user.id))
+    return render_template('getusername.html', username_form=username_form)
+
+
+"""in the html, link to the answerquestion, pass it the username or id"""
+
+@app.route('/<uid>/answerquestion', methods=['GET', 'POST'])
+def answerquestion(uid):
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
+    user = User.query.filter_by(id=uid).first()
+    question=user.security_question
+    question_form=QuestionForm()
+    if 'answer' in request.form:
+        answer= question_form.securityanswer.data
+        if user.check_securityanswer(answer):
+            return redirect(url_for('setnewpassword', uid=uid))
+        else:
+            flash('Wrong answer, try again')
+            return redirect(url_for('answerquestion', uid=uid))
+        # question= user.security_question
+    return render_template('answerquestion.html', question=question, question_form=question_form)
+    
+
+"""get question here"""
+
+@app.route('/<uid>/setnewpassword', methods=['GET', 'POST'])
+def setnewpassword(uid):
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
+    user = User.query.filter_by(id=uid).first()
+    form= PasswordForm()
+    if 'password' in request.form:
+        user.set_password(form.password.data)
+        db.session.add(user)
+        db.session.commit()
+        return redirect(url_for('login'))
+    return render_template('setnewpassword.html', form=form)
 
 
 @app.route('/logout')
@@ -67,40 +121,46 @@ def register():
         return redirect(url_for('index'))
     form = RegistrationForm()
     if form.validate_on_submit():
-        user = User(username=form.username.data, email=form.email.data)
-        user.set_password(form.password.data)
-        db.session.add(user)
-        db.session.commit()
-        flash('Congratulations, you are now a registered user!')
-        return redirect(url_for('login'))
+        user = User.query.filter_by(username=form.username.data).first()
+        if user is not None:
+            flash('Username already exists, pick a different one')
+            return redirect(url_for('register'))
+        if form.is_seller.data is True:
+            seller = Seller(username=form.username.data, email=form.email.data)
+            seller.set_password(form.password.data)
+            seller.security_question = form.securityquestion.data
+            seller.set_securityanswer(form.securityanswer.data)
+            db.session.add(seller)
+            db.session.commit()
+            flash('Congratulations, you are now a registered seller!')
+            return redirect(url_for('login'))
+        else:
+            user = User(username=form.username.data, email=form.email.data)
+            user.set_password(form.password.data)
+            user.security_question = form.securityquestion.data
+            user.set_securityanswer(form.securityanswer.data)
+            db.session.add(user)
+            db.session.commit()
+            flash('Congratulations, you are now a registered user!')
+            return redirect(url_for('login'))
     return render_template('register.html', title='Register', form=form)
-
-
-@app.route('/edit_profile', methods=['GET', 'POST'])
-@login_required
-def edit_profile():
-    form = EditProfileForm()
-    if form.validate_on_submit():
-        current_user.username = form.username.data
-        user.set_password(form.password.data)
-        db.session.commit()
-        flash('Your changes have been saved.')
-        return redirect(url_for('edit_profile'))
-    elif request.method == 'GET':
-        form.username.data = current_user.username
-        form.password.data = current_user.password
-    return render_template('edit_profile.html', title='Edit Profile', form=form)
 
 
 @app.route('/add_item', methods=['GET', 'POST'])
 def add_item():
     form = AddItemForm()
     if form.validate_on_submit():
-        item = Item(name=form.name.data, price=form.price.data, quantity=form.quantity.data, seller = current_user,
-                    category = form.category.data, description = form.description.data, is_for_sale = form.is_for_sale.data)
+        if form.price.data < 0:
+            flash("Cannot choose a negative price. Please try again")
+            return redirect(url_for('add_item'))
+        if form.quantity.data < 0:
+            flash("Cannot choose a negative quantity. Please try again")
+            return redirect(url_for('add_item'))
+        item = Item(name=form.name.data, price=form.price.data, quantity=form.quantity.data, seller=current_user,
+                    category=form.category.data, description=form.description.data, is_for_sale=form.is_for_sale.data)
         db.session.add(item)
         db.session.commit()
-        return redirect(url_for('index'))
+        return redirect(url_for('seller_summary', ))
     return render_template('add_item.html', title='Add Item', form=form)
 
 
@@ -116,18 +176,23 @@ def edit_item(id):
     item = get_item(id)
     form = EditItemForm(obj=item)
     if form.validate_on_submit():
+        if form.price.data < 0:
+            flash("Cannot choose a negative price. Please try again")
+            return redirect(url_for('edit_item', id=id))
+        if form.quantity.data < 0:
+            flash("Cannot choose a negative quantity. Please try again")
+            return redirect(url_for('edit_item', id=id))
         item.name = form.name.data
         item.price = form.price.data
         item.quantity = form.quantity.data
         item.seller = current_user
-        item.catagory = form.category.data
+        item.category = form.category.data
         item.description = form.description.data
         item.is_for_sale = form.is_for_sale.data
         db.session.commit()
         flash('Your changes have been saved.')
         return redirect(url_for('seller_summary'))
     return render_template('edit_item.html', title='Edit Item', form=form)
-
 
 
 @app.route('/<id>/item', methods=['GET', 'POST'])
@@ -157,8 +222,13 @@ def item(id):
             flash("Cannot add a star rating outside of 1-5")
             return redirect(url_for('item', id=id))
         date = '' + str(datetime.now().month) + '/' + str(datetime.now().day) + '/' + str(datetime.now().year)
+        re = Reviews.query.filter_by(user_id=current_user.id, item_id=item.id, content=review_form.content.data).first()
+        if re is not None:
+            flash("You already left this review. Change the content.")
+            return redirect(url_for('item', id=id))
         add_review(item.id, item.name, date, review_form.location.data, review_form.stars.data, review_form.content.data)
         logging.info("User (id: {}, username: {}) added review for Item (id: {}, name: {}) on {}".format(current_user.id, current_user.username, item.id, item.name, date))
+        return redirect(url_for('item', id=item.id))
     all_reviews = db.session.query(Reviews, User, Item).join(User,
                                                    (Reviews.user_id == User.id)).join(Item,
                                                    (Reviews.item_id == Item.id)).filter(Reviews.item_id==id).all()
@@ -198,9 +268,26 @@ def add_to_cart(id, quantity):
     return redirect(url_for('item', id=id))
 
 
+@app.route('/edit_review/<item_id>/<content>', methods=['GET', 'POST'])
+def edit_review(item_id, content):
+    re = Reviews.query.filter_by(user_id=current_user.id, item_id=item_id, content=content).first()
+    item = Item.query.filter_by(id=item_id).first()
+    if re is None:
+        return redirect(url_for('item', id=item_id))
+    form = EditReviewForm(obj=re)
+    if form.validate_on_submit():
+        re.location = form.location.data
+        re.stars = form.stars.data
+        re.content = form.content.data
+        db.session.commit()
+        flash('Your changes have been saved.')
+        return redirect(url_for('item', id=item_id))
+    return render_template('edit_review.html', title='Edit Review', form=form, name=item.name)
+
+
 def add_review(id, name, date, location, stars, content):
-    review = Reviews(user_id=current_user.id, item_id=id, date_time=date, 
-    location=location, stars=stars, content=content)
+    review = Reviews(user_id=current_user.id, item_id=id, date_time=date,
+                     location=location, stars=stars, content=content)
     db.session.add(review)
     db.session.commit()
     flash('Successfully added review for item {}'.format(name))
@@ -221,7 +308,9 @@ def cart():
     cart_items = db.session.query(Cart, Item).join(Item,
                                                    (Cart.item_id == Item.id)).filter(Cart.buyer_id ==
                                                                                      current_user.id).all()
+    cart_items_with_images = []
     for i in cart_items:
+        cart_items_with_images.append((i, i.Item.category+".jpg"))
         if i.Item.quantity < i.Cart.cart_quantity or i.Item.is_for_sale is False:  # not enough anymore
             flash("Item {} no longer in stock in the quantity desired. "
                   "Your cart quantity was changed to 0".format(i.Item.name))
@@ -237,7 +326,7 @@ def cart():
                 i.Cart.cart_quantity = 0
                 db.session.commit()
         return checkout(current_user.id)
-    return render_template('cart.html', cart=cart_items, price=price)
+    return render_template('cart.html', cart=cart_items_with_images, price=price)
 
 
 @app.route('/edit_cart_quantity', methods=['GET', 'POST'])
@@ -332,7 +421,11 @@ def order_history(user_id):
                                                                              Seller.id)).filter(OrderHistory.buyer_id ==
                                                                                                 user_id).order_by(desc(OrderHistory.datetime)).all()
     orders = get_orders_by_time(u_history)
-    return render_template('order_history.html', history=orders) 
+    if len(orders) == 0:
+        has_history = False
+    else:
+        has_history = True
+    return render_template('order_history.html', history=orders, has_history=has_history)
 
 
 @app.route('/<seller_id>/trade_history', methods=['GET', "POST"])
@@ -343,8 +436,11 @@ def trade_history(seller_id):
                                                                     OrderHistory.item_id == Item.id,
                                                                     OrderHistory.seller_id == seller_id).order_by(desc(OrderHistory.datetime)).all()
     orders = get_orders_by_time(s_history)
-
-    return render_template('trade_history.html', history=orders)
+    if len(orders) == 0:
+        has_history = False
+    else:
+        has_history = True
+    return render_template('trade_history.html', history=orders, has_history=has_history)
 
 
 def get_orders_by_time(history):
@@ -393,10 +489,16 @@ def add_seller_review(id):
             flash("Cannot add a star rating outside of 1-5")
             return redirect(url_for('add_seller_review', id=id))
         date = '' + str(datetime.now().month) + '/' + str(datetime.now().day) + '/' + str(datetime.now().year)
+        s_re = SellerReviews.query.filter_by(user_id=current_user.id, item_id=item.id,
+                                             content=form.content.data).first()
+        if s_re is not None:
+            flash("You already left this review. Change the content.")
+            return redirect(url_for('add_seller_review', id=id))
         add_s_review(seller.seller_id, seller.username, date, form.location.data, form.stars.data, form.content.data)
         logging.info("User (id: {}, username: {}) added review for "
                      "Seller (id: {}, username: {}) on {}".format(current_user.id, current_user.username,
                                                                   seller.seller_id, seller.username, date))
+        return redirect(url_for('add_seller_review', id=id))
     all_reviews = db.session.query(SellerReviews, User, Seller).join(User,
                                                    (SellerReviews.user_id == User.id)).join(Seller,
                                                    (SellerReviews.seller_id == Seller.id)).filter(SellerReviews.seller_id==id).all()

@@ -4,7 +4,7 @@
     <h1>Your items for sale</h1>
     <table class="generic_table">
         <tr>
-            <th>Item</th>
+            <th colspan="2">Item</th>
             <th>Price</th>
             <th>Quantity</th>
             <th>For Sale</th>
@@ -12,8 +12,13 @@
         </tr>
         {% for item in items %}
             <tr>
-                <td><div><a class="action" href="{{ url_for('item', id=item.id) }}">{{ item.name }}</a></div></td>
-                <td>${{ item.price }}</td>
+                <td colspan="2"><div><a class="action" href="{{ url_for('item', id=item.id) }}">{{ item.name }}</a></div>
+                Category: {{ item.category }}</td>
+                <td>$
+                    <script type="text/javascript">
+                        formatPrice({{ item.price }});
+                    </script>
+                </td>
                 <td>{{ item.quantity }}</td>
                 {% if item.is_for_sale %}
                     <td>Yes</td>

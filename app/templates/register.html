@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-
+{% block title %}Register{% endblock %}
 {% block content %}
     <h1>Register</h1>
     <form action="" method="post">
@@ -13,7 +13,7 @@
         </p>
         <p>
             {{ form.email.label }}<br>
-            {{ form.email(size=64) }}<br>
+            {{ form.email(size=32) }}<br>
             {% for error in form.email.errors %}
             <span style="color: red;">[{{ error }}]</span>
             {% endfor %}
@@ -29,6 +29,27 @@
             {{ form.password2.label }}<br>
             {{ form.password2(size=32) }}<br>
             {% for error in form.password2.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.securityquestion.label }}<br>
+            {{ form.securityquestion(size=32) }}<br>
+            {% for error in form.securityquestion.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.securityanswer.label }}<br>
+            {{ form.securityanswer(size=32) }}<br>
+            {% for error in form.securityanswer.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.is_seller.label }}<br>
+            {{ form.is_seller(size=32) }}<br>
+            {% for error in form.is_seller.errors %}
             <span style="color: red;">[{{ error }}]</span>
             {% endfor %}
         </p>

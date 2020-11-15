@@ -1,10 +1,15 @@
-html { font-family: sans-serif; background: #eee; }
+html { font-family: Georgia; background: #eee; }
 body { margin: 0 auto; background: white; }
-h1 { font-family: serif; color: #000000	; margin: 1rem 0; }
-h2 { font-family: serif; color: #000000	; margin: 1rem 0; }
-h3 { font-family: serif; color: #000000	; margin: 1rem 0; }
+h1 { font-family: Georgia; color: #000000	; margin: 1rem 0; }
+h2 { font-family: Georgia; color: #000000	; margin: 1rem 0; }
+h3 { font-family: Georgia; color: #000000	; margin: 1rem 0; }
 nav { background: lightgray; display: flex; align-items: center; padding: 0 0.5rem; }
 nav h1 { flex: auto; margin: 0; }
+nav img {
+    display: block;
+    width: 30px;
+    height: 30px;
+}
 nav h1 a { text-decoration: none; padding: 0.25rem 0.5rem; }
 nav ul { list-style-type: none; margin: 0; padding: 0; overflow: hidden;}
 nav li { float: left;}

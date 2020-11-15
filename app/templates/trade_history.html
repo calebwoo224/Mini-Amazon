@@ -2,27 +2,30 @@
 {% block title %}Trade History{% endblock %}
 {% block content %}
     <h1>Trade History</h1>
+    {% if not has_history %}
+        <p>You have not sold any items.</p>
+    {% endif %}
     {% for order in history %}
     <h3>Purchase Date: {{ order["datetime"] }}</h3>
-    <table class="purchases_table">
+    <table class="generic_table">
+    <thead>
         <tr>
-            <th>Item</th>
-            <th>Price</th>
-            <th>Quantity</th>
-            <th>Buyer</th>
         </tr>
+    </thead>
+    <tbody>
     {% for purchase in order["orders"] %}
         <tr>
             <td><div><a class="action" href="{{ url_for('item', id=purchase.Item.id) }}">{{ purchase.Item.name }}</a></div></td>
-            <td>$
+            <td>Price: $
                 <script type="text/javascript">
                     formatPrice({{ purchase.OrderHistory.price_sold }});
                 </script>
             </td>
-            <td>{{ purchase.OrderHistory.quantity_sold }}</td>
-            <td>{{ purchase.User.username }}</td>
+            <td>Quantity Sold: {{ purchase.OrderHistory.quantity_sold }}</td>
+            <td>Buyer: {{ purchase.User.username }}</td>
         </tr>
     {% endfor %}
+    </tbody>
     </table>
     {% endfor %}
 

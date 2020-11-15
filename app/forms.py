@@ -1,5 +1,6 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, DecimalField, IntegerField, SelectField, TextField
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, DecimalField
+from wtforms import IntegerField, SelectField, TextField, TextAreaField
 from wtforms.validators import Length
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo
 from app.models import User
@@ -17,12 +18,29 @@ class LoginForm(FlaskForm):
     submit = SubmitField('Sign In')
 
 
+class QuestionForm(FlaskForm):
+    securityanswer = StringField('Security Answer', validators=[DataRequired()])
+
+
+class UsernameForm(FlaskForm):
+    username = StringField('Username', validators=[DataRequired()])
+
+
+class PasswordForm(FlaskForm):
+    password = PasswordField('Password', validators=[DataRequired()])
+    password2 = PasswordField(
+        'Repeat Password', validators=[DataRequired(), EqualTo('password')])
+
+
 class RegistrationForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])
     email = StringField('Email', validators=[DataRequired(), Email()])
     password = PasswordField('Password', validators=[DataRequired()])
     password2 = PasswordField(
         'Repeat Password', validators=[DataRequired(), EqualTo('password')])
+    securityquestion = StringField('Security Question', validators=[DataRequired()])
+    securityanswer = StringField('Security Answer', validators=[DataRequired()])
+    is_seller= BooleanField("Register as seller?", default=False) 
     submit = SubmitField('Register')
 
     def validate_username(self, username):
@@ -34,12 +52,6 @@ class RegistrationForm(FlaskForm):
         user = User.query.filter_by(email=email.data).first()
         if user is not None:
             raise ValidationError('Please use a different email address.')
-
-
-class EditProfileForm(FlaskForm):
-    username = StringField('New username', validators=[DataRequired()])
-    password = StringField('New password', validators=[DataRequired()])
-    submit = SubmitField('Submit')
 
 
 class AddItemForm(FlaskForm):
@@ -55,7 +67,7 @@ class AddItemForm(FlaskForm):
 
 
 class EditItemForm(FlaskForm):
-    name = StringField('Item Name', validators=[DataRequired()], default = 1)
+    name = StringField('Item Name', validators=[DataRequired()], default=1)
     price = DecimalField('Item Price', validators=[DataRequired()], places=2)
     quantity = IntegerField('Item Quantity', validators=[DataRequired()])
     description = StringField('Brief Description', validators=[DataRequired()])
@@ -73,15 +85,21 @@ class AddtoCart(FlaskForm):
 class AddReviewForm(FlaskForm):
     location = StringField('Location')
     stars = IntegerField('Stars', validators=[DataRequired()])
-    content = TextField('Write your review:', validators=[DataRequired()])
+    content = TextAreaField('Write your review:', validators=[DataRequired()])
 
 
 class AddSellerReviewForm(FlaskForm):
     location = StringField('Location')
     stars = IntegerField('Stars', validators=[DataRequired()])
-    content = TextField('Write your review:', validators=[DataRequired()])
+    content = TextAreaField('Write your review:', validators=[DataRequired()])
+
+
+class EditReviewForm(FlaskForm):
+    location = StringField('Location')
+    stars = IntegerField('Stars', validators=[DataRequired()])
+    content = TextAreaField('Write your review:', validators=[DataRequired()])
+    submit = SubmitField('Finished')
 
 
 class EditBalance(FlaskForm):
     newbalance = DecimalField('Amount', validators=[DataRequired()], places=2)
-

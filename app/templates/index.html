@@ -10,12 +10,21 @@
     <h2>Recommended Item List</h2>
     {% for cat in ratings %}
     <h3>{{ cat }}</h3>
-    {% for key in ratings[cat] %}
-    <div><a class="action" href="{{ url_for('item', id=key) }}">{{ names[cat][key] }}</a>; Average Review: {{ ratings[cat][key] }}</div>
-    {% endfor %}
-    {% endfor %}
-    <h2>All Items</h2>
-    {% for item in items %}
-    <div><a class="action" href="{{ url_for('item', id=item.id) }}">{{ item.name }}</a></div>
+        <table class="generic_table">
+            <thead>
+            </thead>
+            <tbody>
+            {% for key in ratings[cat] %}
+                <tr>
+                    <td>
+                        <div><a class="action" href="{{ url_for('item', id=key) }}">{{ names[cat][key] }}</a></div>
+                        <img width="30%" height="30%" src="{{url_for('static', filename=images[cat][key])}}" /></td>
+                    </td>
+                    <td>Average rating: {{ ratings[cat][key] }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
     {% endfor %}
 {% endblock %}

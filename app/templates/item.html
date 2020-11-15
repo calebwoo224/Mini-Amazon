@@ -99,7 +99,7 @@
             </p>
             <p>
                 {{ review_form.content.label }}<br>
-                {{ review_form.content(size=32) }}<br>
+                {{ review_form.content(rows='5', cols='35') }}<br>
                 {% for error in review_form.content.errors %}
                 <span style="color: red;">[{{ error }}]</span>
                 {% endfor %}
