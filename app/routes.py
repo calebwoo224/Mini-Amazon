@@ -508,7 +508,7 @@ def add_seller_review(id):
             flash("Cannot add a star rating outside of 1-5")
             return redirect(url_for('add_seller_review', id=id))
         date = '' + str(datetime.now().month) + '/' + str(datetime.now().day) + '/' + str(datetime.now().year)
-        s_re = SellerReviews.query.filter_by(user_id=current_user.id, item_id=item.id,
+        s_re = SellerReviews.query.filter_by(user_id=current_user.id, seller_id=seller.id,
                                              content=form.content.data).first()
         if s_re is not None:
             flash("You already left this review. Change the content.")
@@ -516,12 +516,46 @@ def add_seller_review(id):
         add_s_review(seller.seller_id, seller.username, date, form.location.data, form.stars.data, form.content.data)
         logging.info("User (id: {}, username: {}) added review for "
                      "Seller (id: {}, username: {}) on {}".format(current_user.id, current_user.username,
-                                                                  seller.seller_id, seller.username, date))
+                                                                  seller.id, seller.username, date))
         return redirect(url_for('add_seller_review', id=id))
     all_reviews = db.session.query(SellerReviews, User, Seller).join(User,
                                                    (SellerReviews.user_id == User.id)).join(Seller,
                                                    (SellerReviews.seller_id == Seller.id)).filter(SellerReviews.seller_id==id).all()
     return render_template('add_seller_review.html', seller=seller, form=form, reviews=all_reviews)
+
+
+@app.route('/edit_seller_review/<seller_id>/<content>', methods=['GET', 'POST'])
+def edit_seller_review(seller_id, content):
+    date = '' + str(datetime.now().month) + '/' + str(datetime.now().day) + '/' + str(datetime.now().year)
+    re = SellerReviews.query.filter_by(user_id=current_user.id, seller_id=seller_id, content=content).first()
+    seller = Seller.query.filter_by(id=seller_id).first()
+    if re is None:
+        return redirect(url_for('add_seller_review', id=seller_id))
+    form = EditReviewForm(obj=re)
+    if 'delete' in request.form:
+        db.session.delete(re)
+        db.session.commit()
+        flash('You have deleted this review.')
+        logging.info("User (id: {}, username: {}) deleted review for Seller (id: {}, username: {}) on {}".format(current_user.id, current_user.username, seller.id, seller.username, date))
+        return redirect(url_for('add_seller_review', id=seller_id))
+    if 'edit' in request.form:
+        stars = form.stars.data
+        try:
+            stars = int(stars)
+        except TypeError:
+            flash("Cannot add a non-numeric value to stars")
+            return redirect(url_for('edit_seller_review', seller_id=seller_id, content=content))
+        if stars < 1 or stars > 5:
+            flash("Cannot add a star rating outside of 1-5")
+            return redirect(url_for('edit_seller_review', seller_id=seller_id, content=content))
+        re.location = form.location.data
+        re.stars = form.stars.data
+        re.content = form.content.data
+        db.session.commit()
+        flash('Your changes have been saved.')
+        logging.info("User (id: {}, username: {}) edited review for Seller (id: {}, username: {}) on {}".format(current_user.id, current_user.username, seller.id, seller.username, date))
+        return redirect(url_for('add_seller_review', id=seller_id))
+    return render_template('edit_seller_review.html', title='Edit Seller Review', form=form, name=seller.username)
 
 
 def add_s_review(id, name, date, location, stars, content):
@@ -530,7 +564,6 @@ def add_s_review(id, name, date, location, stars, content):
     db.session.add(review)
     db.session.commit()
     flash('Successfully added seller review for seller {}'.format(name))
-    return redirect(url_for('add_seller_review', id=id))
 
 
 @app.route('/profile', methods=['GET', 'POST'])

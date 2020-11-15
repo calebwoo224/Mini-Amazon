@@ -6,25 +6,42 @@
     {% if reviews | length == 0 %}
     <h3>There are no reviews for this seller</h3>
     {% else %}
-    <table>
-        <tr>
-            <th>Reviewer</th>
-            <th>Date</th>
-            <th>Location</th>
-            <th>Stars</th>
-            <th>Content</th>
-        </tr>
-        {% for review in reviews %}
-        <tr>
-            <td>{{ review.User.username }}</td>
-            <td>{{ review.SellerReviews.date_time }}</td>
-            <td>{{ review.SellerReviews.location }}</td>
-            <td>{{ review.SellerReviews.stars }}</td>
-            <td>{{ review.SellerReviews.content }}</td>
-        </tr>
-        {% endfor %}
+    <table id="example" class="generic_table">
+        <thead>
+            <tr>
+                <th>Reviewer</th>
+                <th>Date</th>
+                <th>Location</th>
+                <th>Stars</th>
+                <th>Content</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for review in reviews %}
+            <tr>
+                <td>{{ review.User.username }}</td>
+                <td>{{ review.SellerReviews.date_time }}</td>
+                <td>{{ review.SellerReviews.location }}</td>
+                <td>{{ review.SellerReviews.stars }}</td>
+                <td>{{ review.SellerReviews.content }}</td>
+                {% if  review.User.id == current_user.id %}
+                <td><a class="action"
+                        href="{{ url_for('edit_seller_review', seller_id=seller.id, content=review.SellerReviews.content) }}">Edit</a></td>
+                {% else %}
+                <td></td>
+                {% endif %}
+            </tr>
+            {% endfor %}
+        </tbody>
     </table>
+    <script>
+        $(document).ready(function () {
+            $('#example').DataTable();
+        });
+    </script>
     {% endif %}
+    </table>
     <h2>Write a review</h2>
     <form action="" method="post" novalidate>
         {{ form.hidden_tag() }}
