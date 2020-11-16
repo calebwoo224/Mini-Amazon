@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+<!--ADD IMAGE LATER?-->
+{% block title %}Edit Seller Review{% endblock %}
+{% block content %}
+    <h1>Edit Seller Review for {{ name }}</h1>
+    <form action="" method="post" novalidate>
+        {{ form.hidden_tag() }}
+        <p>
+            {{ form.location.label }}<br>
+            {{ form.location(size=32) }}<br>
+            {% for error in form.location.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.stars.label }}<br>
+            {{ form.stars }}<br>
+            {% for error in form.stars.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.content.label }}<br>
+            {{ form.content(rows='5', cols='35') }}<br>
+            {% for error in form.content.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <input type='submit' name='edit' value='Finished'>
+    </form>
+    <form action="" method="post" novalidate>
+        <input type='submit' name='delete' value='Delete'>
+    </form>
+{% endblock %}
