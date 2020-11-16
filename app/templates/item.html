@@ -20,10 +20,12 @@
             {% else %}
             Quantity: 0<br>
             {% endif %}
-            Average Review: {{ avg_rating }}<br>
+            Average Review: <script type="text/javascript">
+                  formatPrice({{ avg_rating }});
+              </script><br>
               Seller: <a class="action" href="{{ url_for('add_seller_review', id=item.seller.seller_id) }}">{{ item.seller.username }}</a><br>
               Category: {{ item.category }}<br>
-              In Stock: {{ item.is_for_sale }}<br>
+              For Sale by Seller? {{ item.is_for_sale }}<br>
               <p>
                   Description:<br>
                   <p>{{ item.description }}</p><br>

@@ -11,7 +11,6 @@ from app.models import User, Item, Cart, Reviews, OrderHistory, Seller, SellerRe
 from datetime import datetime
 from sqlalchemy import desc
 from sqlalchemy.sql import func
-from sqlalchemy import literal
 
 
 @app.route('/')
@@ -68,9 +67,6 @@ def getusername():
     return render_template('getusername.html', username_form=username_form)
 
 
-"""in the html, link to the answerquestion, pass it the username or id"""
-
-
 @app.route('/<uid>/answerquestion', methods=['GET', 'POST'])
 def answerquestion(uid):
     if current_user.is_authenticated:
@@ -85,11 +81,7 @@ def answerquestion(uid):
         else:
             flash('Wrong answer, try again')
             return redirect(url_for('answerquestion', uid=uid))
-        # question= user.security_question
     return render_template('answerquestion.html', question=question, question_form=question_form)
-
-
-"""get question here"""
 
 
 @app.route('/<uid>/setnewpassword', methods=['GET', 'POST'])
@@ -228,7 +220,7 @@ def item(id):
         try:
             stars = int(stars)
         except TypeError:
-            flash("Cannot add a non-numeric value to stars")
+            flash("Cannot add a non-integer value to stars")
             return redirect(url_for('item', id=id))
         if stars < 1 or stars > 5:
             flash("Cannot add a star rating outside of 1-5")
@@ -642,7 +634,6 @@ def category(name):
 
 
 def categoryItems(cat):
-    # items = category.items.all()
     query = Item.query.filter_by(category=cat).all()
     return query
 
@@ -661,13 +652,7 @@ def search_start():
 
 @app.route('/results/<search>/', methods=['GET', 'POST'])
 def search_results(search):
-    results = []
-    # search_string = search.data['search']
     search_string = '%{}%'.format(search)
-
-    # results = Item.query.filter(literal(search_string).contains(Item.name)) bad
-    # results = Item.query.filter_by(name = search).all() exact name
-    # results = Item.query.filter(Item.name.like(search_string)).all()
     results = db.session.query(Item).filter(Item.name.like(search_string)).all()
     final_results = []
     for r in results:

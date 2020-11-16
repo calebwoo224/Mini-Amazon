@@ -15,7 +15,8 @@ If you would like to run the server + site locally, follow these steps.
 5. Type `flask run` into your terminal/command line  
 6. Open up the site on your browser (address is `localhost`, port is `5000`)
 
-Note: you can check the `mini_amazon.log` file, which logs some of the user requests to the server)  
+Note: you can check the `mini_amazon.log` file, which logs some of the user requests to the server if you
+run the server locally.
 
 ### Users
 There are a couple of users set up which you can access. Otherwise, you can also register your
