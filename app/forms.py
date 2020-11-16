@@ -6,7 +6,9 @@ from wtforms.validators import ValidationError, DataRequired, Email, EqualTo
 from app.models import User
 from app.models import Item
 from wtforms.validators import DataRequired
-from app.models import Item, Category
+from app.models import Category
+
+
 # probably can remove this import below as it is no longer used in dropdown choices
 # from wtforms.ext.sqlalchemy.fields import QuerySelectField
 
@@ -40,7 +42,7 @@ class RegistrationForm(FlaskForm):
         'Repeat Password', validators=[DataRequired(), EqualTo('password')])
     securityquestion = StringField('Security Question', validators=[DataRequired()])
     securityanswer = StringField('Security Answer', validators=[DataRequired()])
-    is_seller= BooleanField("Register as seller?", default=False) 
+    is_seller = BooleanField("Register as seller?", default=False)
     submit = SubmitField('Register')
 
     def validate_username(self, username):
@@ -98,8 +100,28 @@ class EditReviewForm(FlaskForm):
     location = StringField('Location')
     stars = IntegerField('Stars', validators=[DataRequired()])
     content = TextAreaField('Write your review:', validators=[DataRequired()])
-    #submit = SubmitField('Finished')
+    # submit = SubmitField('Finished')
 
 
 class EditBalance(FlaskForm):
     newbalance = DecimalField('Amount', validators=[DataRequired()], places=2)
+
+
+
+class SearchForm(FlaskForm):
+    # choices = [('Artist', 'Artist'), ('Album', 'Album'), ('Publisher', 'Publisher')]
+    # select = SelectField('Search for music:', choices=choices)
+    category_list = ['All Categories']
+    category_qry = list(Category.query.all())
+    category_list.append(category_qry)
+    select = SelectField('Select Category', choices=category_list, default="All Categories")
+    search = StringField('Search by item name: ')
+    submit = SubmitField('Search')
+
+
+"""
+class SearchForm(FlaskForm):
+    search = StringField('search', [DataRequired()])
+    submit = SubmitField('Search',
+                         render_kw={'class': 'btn btn-success btn-block'})
+"""

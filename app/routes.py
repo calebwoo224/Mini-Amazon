@@ -1,8 +1,9 @@
-from flask import Flask, render_template, redirect, url_for, flash, request, jsonify
+from flask import Flask, render_template, redirect, url_for, flash, request, jsonify, redirect
 from flask_sqlalchemy import SQLAlchemy
 from app import app
 from app import db
-from app.forms import LoginForm, AddItemForm, AddtoCart, AddReviewForm, AddSellerReviewForm, EditBalance, RegistrationForm, EditItemForm
+from app.forms import LoginForm, AddItemForm, AddtoCart, AddReviewForm, AddSellerReviewForm, EditBalance, \
+    RegistrationForm, EditItemForm, SearchForm
 from app.forms import QuestionForm, UsernameForm, PasswordForm, EditReviewForm
 from flask_login import current_user, login_user, logout_user, login_required
 import logging
@@ -10,6 +11,7 @@ from app.models import User, Item, Cart, Reviews, OrderHistory, Seller, SellerRe
 from datetime import datetime
 from sqlalchemy import desc
 from sqlalchemy.sql import func
+from sqlalchemy import literal
 
 
 @app.route('/')
@@ -20,7 +22,8 @@ def index():
         top_5 = {}
         names = {}
         images = {}
-        for cat in db.session.query(Item.category, func.count(Item.id)).group_by(Item.category).order_by(func.count(Item.id).desc()).all()[0:5]:
+        for cat in db.session.query(Item.category, func.count(Item.id)).group_by(Item.category).order_by(
+                func.count(Item.id).desc()).all()[0:5]:
             top_5[cat[0]] = {}
             names[cat[0]] = {}
             images[cat[0]] = {}
@@ -67,15 +70,16 @@ def getusername():
 
 """in the html, link to the answerquestion, pass it the username or id"""
 
+
 @app.route('/<uid>/answerquestion', methods=['GET', 'POST'])
 def answerquestion(uid):
     if current_user.is_authenticated:
         return redirect(url_for('index'))
     user = User.query.filter_by(id=uid).first()
-    question=user.security_question
-    question_form=QuestionForm()
+    question = user.security_question
+    question_form = QuestionForm()
     if 'answer' in request.form:
-        answer= question_form.securityanswer.data
+        answer = question_form.securityanswer.data
         if user.check_securityanswer(answer):
             return redirect(url_for('setnewpassword', uid=uid))
         else:
@@ -83,16 +87,17 @@ def answerquestion(uid):
             return redirect(url_for('answerquestion', uid=uid))
         # question= user.security_question
     return render_template('answerquestion.html', question=question, question_form=question_form)
-    
+
 
 """get question here"""
+
 
 @app.route('/<uid>/setnewpassword', methods=['GET', 'POST'])
 def setnewpassword(uid):
     if current_user.is_authenticated:
         return redirect(url_for('index'))
     user = User.query.filter_by(id=uid).first()
-    form= PasswordForm()
+    form = PasswordForm()
     if 'password' in request.form:
         user.set_password(form.password.data)
         db.session.add(user)
@@ -198,14 +203,14 @@ def edit_item(id):
 @app.route('/<id>/item', methods=['GET', 'POST'])
 def item(id):
     item = get_item(id)
-    avg_stars = db.session.query(func.avg(Reviews.stars)).filter(Reviews.item_id==item.id).first()
+    avg_stars = db.session.query(func.avg(Reviews.stars)).filter(Reviews.item_id == item.id).first()
     item.avg_user_rating = avg_stars[0]
     db.session.commit()
     form = AddtoCart()
     review_form = AddReviewForm()
     update_cart(item, form)
-    avg_rating = Item.query.filter(Item.id==item.id).first().avg_user_rating
-    imagepath = item.category+".jpg"
+    avg_rating = Item.query.filter(Item.id == item.id).first().avg_user_rating
+    imagepath = item.category + ".jpg"
     if 'cart' in request.form:
         if current_user.is_anonymous:
             flash('To add an item to cart, please login')
@@ -229,13 +234,21 @@ def item(id):
         if re is not None:
             flash("You already left this review. Change the content.")
             return redirect(url_for('item', id=id))
-        add_review(item.id, item.name, date, review_form.location.data, review_form.stars.data, review_form.content.data)
-        logging.info("User (id: {}, username: {}) added review for Item (id: {}, name: {}) on {}".format(current_user.id, current_user.username, item.id, item.name, date))
+        add_review(item.id, item.name, date, review_form.location.data, review_form.stars.data,
+                   review_form.content.data)
+        logging.info(
+            "User (id: {}, username: {}) added review for Item (id: {}, name: {}) on {}".format(current_user.id,
+                                                                                                current_user.username,
+                                                                                                item.id, item.name,
+                                                                                                date))
         return redirect(url_for('item', id=item.id))
     all_reviews = db.session.query(Reviews, User, Item).join(User,
-                                                   (Reviews.user_id == User.id)).join(Item,
-                                                   (Reviews.item_id == Item.id)).filter(Reviews.item_id==id).all()
-    return render_template('item.html', item=item, form=form, review_form=review_form, reviews=all_reviews, avg_rating=avg_rating, imagepath=imagepath)
+                                                             (Reviews.user_id == User.id)).join(Item,
+                                                                                                (
+                                                                                                            Reviews.item_id == Item.id)).filter(
+        Reviews.item_id == id).all()
+    return render_template('item.html', item=item, form=form, review_form=review_form, reviews=all_reviews,
+                           avg_rating=avg_rating, imagepath=imagepath)
 
 
 def update_cart(item, form):
@@ -246,7 +259,7 @@ def update_cart(item, form):
         if quantity > 20:
             form.item_quantity.choices = [num for num in range(1, 21)]
         else:
-            form.item_quantity.choices = [num for num in range(1, quantity+1)]
+            form.item_quantity.choices = [num for num in range(1, quantity + 1)]
 
 
 def add_to_cart(id, quantity):
@@ -283,7 +296,11 @@ def edit_review(item_id, content):
         db.session.delete(re)
         db.session.commit()
         flash('You have deleted this review.')
-        logging.info("User (id: {}, username: {}) deleted review for Item (id: {}, name: {}) on {}".format(current_user.id, current_user.username, item.id, item.name, date))
+        logging.info(
+            "User (id: {}, username: {}) deleted review for Item (id: {}, name: {}) on {}".format(current_user.id,
+                                                                                                  current_user.username,
+                                                                                                  item.id, item.name,
+                                                                                                  date))
         return redirect(url_for('item', id=item_id))
     if 'edit' in request.form:
         stars = form.stars.data
@@ -300,7 +317,11 @@ def edit_review(item_id, content):
         re.content = form.content.data
         db.session.commit()
         flash('Your changes have been saved.')
-        logging.info("User (id: {}, username: {}) edited review for Item (id: {}, name: {}) on {}".format(current_user.id, current_user.username, item.id, item.name, date))
+        logging.info(
+            "User (id: {}, username: {}) edited review for Item (id: {}, name: {}) on {}".format(current_user.id,
+                                                                                                 current_user.username,
+                                                                                                 item.id, item.name,
+                                                                                                 date))
         return redirect(url_for('item', id=item_id))
     return render_template('edit_review.html', title='Edit Review', form=form, name=item.name)
 
@@ -329,7 +350,7 @@ def cart():
                                                                                      current_user.id).all()
     cart_items_with_images = []
     for i in cart_items:
-        cart_items_with_images.append((i, i.Item.category+".jpg"))
+        cart_items_with_images.append((i, i.Item.category + ".jpg"))
         if i.Item.quantity < i.Cart.cart_quantity or i.Item.is_for_sale is False:  # not enough anymore
             flash("Item {} no longer in stock in the quantity desired. "
                   "Your cart quantity was changed to 0".format(i.Item.name))
@@ -395,8 +416,8 @@ def checkout(user_id):
         if current_user.balance < db_item.price:
             flash("Item {} price changed. Your balance is not enough".format(db_item.name))
             continue
-        current_user.balance -= (db_item.price*cart_item.cart_quantity)
-        seller.balance += (db_item.price*cart_item.cart_quantity)
+        current_user.balance -= (db_item.price * cart_item.cart_quantity)
+        seller.balance += (db_item.price * cart_item.cart_quantity)
         db_item.quantity = new_quantity
         items_checked_out.append(db_item.name)
         db.session.commit()
@@ -438,7 +459,8 @@ def order_history(user_id):
                                  Seller).join(Item, (OrderHistory.item_id ==
                                                      Item.id)).join(Seller, (OrderHistory.seller_id ==
                                                                              Seller.id)).filter(OrderHistory.buyer_id ==
-                                                                                                user_id).order_by(desc(OrderHistory.datetime)).all()
+                                                                                                user_id).order_by(
+        desc(OrderHistory.datetime)).all()
     orders = get_orders_by_time(u_history)
     if len(orders) == 0:
         has_history = False
@@ -453,7 +475,8 @@ def trade_history(seller_id):
                                  Item,
                                  User).join(Item).join(User).filter(OrderHistory.buyer_id == User.id,
                                                                     OrderHistory.item_id == Item.id,
-                                                                    OrderHistory.seller_id == seller_id).order_by(desc(OrderHistory.datetime)).all()
+                                                                    OrderHistory.seller_id == seller_id).order_by(
+        desc(OrderHistory.datetime)).all()
     orders = get_orders_by_time(s_history)
     if len(orders) == 0:
         has_history = False
@@ -485,7 +508,7 @@ def get_orders_by_time(history):
 @app.route('/seller_summary', methods=['GET', 'POST'])
 def seller_summary():
     items = sellerItems(current_user)
-    return render_template('seller_summary.html', items = items)
+    return render_template('seller_summary.html', items=items)
 
 
 def sellerItems(seller):
@@ -519,8 +542,10 @@ def add_seller_review(id):
                                                                   seller.seller_id, seller.username, date))
         return redirect(url_for('add_seller_review', id=id))
     all_reviews = db.session.query(SellerReviews, User, Seller).join(User,
-                                                   (SellerReviews.user_id == User.id)).join(Seller,
-                                                   (SellerReviews.seller_id == Seller.id)).filter(SellerReviews.seller_id==id).all()
+                                                                     (SellerReviews.user_id == User.id)).join(Seller,
+                                                                                                              (
+                                                                                                                          SellerReviews.seller_id == Seller.id)).filter(
+        SellerReviews.seller_id == id).all()
     return render_template('add_seller_review.html', seller=seller, form=form, reviews=all_reviews)
 
 
@@ -577,5 +602,29 @@ def category(name):
 
 def categoryItems(cat):
     # items = category.items.all()
-    query = Item.query.filter_by(category = cat).all()
+    query = Item.query.filter_by(category=cat).all()
     return query
+
+
+@app.route('/search', methods=['GET', 'POST'])
+def search_start():
+    form = SearchForm()
+    if form.validate_on_submit():
+        return redirect(url_for('search_results', search = form.search.data))
+    return render_template('search.html', form=form)
+
+
+
+@app.route('/results/<search>/', methods=['GET', 'POST'])
+def search_results(search):
+    results = []
+    # search_string = search.data['search']
+    search_string = '%{}%'.format(search)
+
+    # results = Item.query.filter(literal(search_string).contains(Item.name)) bad
+    # results = Item.query.filter_by(name = search).all() exact name
+    # results = Item.query.filter(Item.name.like(search_string)).all()
+    results = db.session.query(Item).filter(Item.name.like(search_string)).all()
+    # display results
+    return render_template('results.html', results=results, search = search)
+

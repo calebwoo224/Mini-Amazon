@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Results{% endblock %}
+{% block content %}
+    <h1>Item Results for "{{ search }}"</h1>
+    <table id="example" class="generic_table">
+        <thead>
+            <tr>
+                <th>Items</th>
+            </tr>
+        </thead>
+    <tbody>
+        {% for item in results %}
+            <tr>
+                <td>
+                    <div><a class="action" href="{{ url_for('item', id=item.id) }}">{{ item.name }}</a></div>
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+    </table>
+    <script>
+        $(document).ready( function () {
+            $('#example').DataTable();
+        } );
+    </script>
+{% endblock %}

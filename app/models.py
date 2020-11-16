@@ -4,6 +4,8 @@ from flask_login import UserMixin
 from app import login
 
 
+
+
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(20), unique=True)
@@ -54,6 +56,8 @@ class Seller(User):
 
 
 class Item(db.Model):
+    __searchable__ = ['name']
+
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(30))
     price = db.Column(db.Float, nullable=False)
