@@ -643,9 +643,8 @@ def categoryItems(cat):
 def search_start():
     form = SearchForm()
     if form.validate_on_submit():
-        return redirect(url_for('search_results', search = form.search.data))
+        return redirect(url_for('search_results', search=form.search.data))
     return render_template('search.html', form=form)
-
 
 
 @app.route('/results/<search>/', methods=['GET', 'POST'])
@@ -658,6 +657,14 @@ def search_results(search):
     # results = Item.query.filter_by(name = search).all() exact name
     # results = Item.query.filter(Item.name.like(search_string)).all()
     results = db.session.query(Item).filter(Item.name.like(search_string)).all()
+    final_results = []
+    for r in results:
+        if r.is_for_sale is False:
+            continue
+        if r.category is None:
+            final_results.append((r, "Other.jpg"))
+        else:
+            final_results.append((r, r.category + ".jpg"))
     # display results
-    return render_template('results.html', results=results, search = search)
+    return render_template('results.html', results=final_results, search=search)
 

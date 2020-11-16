@@ -5,14 +5,26 @@
     <table id="example" class="generic_table">
         <thead>
             <tr>
-                <th>Items</th>
+                <th>Item</th>
+                <th>Category</th>
+                <th>Seller</th>
+                <th>Price</th>
             </tr>
         </thead>
     <tbody>
         {% for item in results %}
             <tr>
                 <td>
-                    <div><a class="action" href="{{ url_for('item', id=item.id) }}">{{ item.name }}</a></div>
+                    <div><a class="action" href="{{ url_for('item', id=item[0].id) }}">{{ item[0].name }}</a></div>
+                    <img width="30%" height="30%" src="{{url_for('static', filename=item[1])}}" />
+                </td>
+                <td>{{ item[0].category}}</td>
+                <td>{{ item[0].seller.username }}</td>
+                <td id="price">$
+                    <script type="text/javascript">
+                        var StringValue = parseFloat({{ item[0].price|tojson }});
+                        document.write(StringValue.toFixed( 2 ));
+                    </script>
                 </td>
             </tr>
         {% endfor %}
