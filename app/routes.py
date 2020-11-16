@@ -130,6 +130,10 @@ def register():
         if user is not None:
             flash('Username already exists, pick a different one')
             return redirect(url_for('register'))
+        user_with_email = User.query.filter_by(email=form.email.data).first()
+        if user_with_email is not None:
+            flash('Email already associated with an existing account. Please try again')
+            return redirect(url_for('register'))
         if form.is_seller.data is True:
             seller = Seller(username=form.username.data, email=form.email.data)
             seller.set_password(form.password.data)
@@ -623,8 +627,12 @@ def balance():
 
 @app.route('/explore_categories', methods=['GET', 'POST'])
 def explore_categories():
-    categories = Category.query.all()
-    return render_template('explore_categories.html', title='Explore Categories', categories=categories)
+    if current_user.is_authenticated:
+        categories = Category.query.all()
+        return render_template('explore_categories.html', title='Explore Categories', categories=categories)
+    else:
+        flash("To view categories, please login")
+        return redirect(url_for("login"))
 
 
 @app.route('/category/<name>', methods=['GET', 'POST'])
@@ -641,10 +649,14 @@ def categoryItems(cat):
 
 @app.route('/search', methods=['GET', 'POST'])
 def search_start():
-    form = SearchForm()
-    if form.validate_on_submit():
-        return redirect(url_for('search_results', search=form.search.data))
-    return render_template('search.html', form=form)
+    if current_user.is_authenticated:
+        form = SearchForm()
+        if form.validate_on_submit():
+            return redirect(url_for('search_results', search=form.search.data))
+        return render_template('search.html', form=form)
+    else:
+        flash("To search, please login")
+        return redirect(url_for('login'))
 
 
 @app.route('/results/<search>/', methods=['GET', 'POST'])
