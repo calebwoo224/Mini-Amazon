@@ -10,6 +10,9 @@
     </script><br>
         <a href="{{ url_for('order_history', user_id=current_user.id) }}">See your Order History</a><br>
         <a href="{{ url_for('balance') }}">Edit your Current Balance</a><br>
+        {% if current_user.seller_id%}
+        <a href="{{ url_for('add_seller_review', id=current_user.id) }}">See Reviews users have left for you</a><br>
+        {% endif %}
     </div>
     
 {% endblock %}

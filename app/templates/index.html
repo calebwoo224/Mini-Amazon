@@ -20,7 +20,9 @@
                         <div><a class="action" href="{{ url_for('item', id=key) }}">{{ names[cat][key] }}</a></div>
                         <img width="30%" height="30%" src="{{url_for('static', filename=images[cat][key])}}" /></td>
                     </td>
-                    <td>Average rating: {{ ratings[cat][key] }}</td>
+                    <td>Average rating: <script type="text/javascript">
+                        formatPrice({{ ratings[cat][key] }});
+                    </script></td>
                 </tr>
             {% endfor %}
             </tbody>
