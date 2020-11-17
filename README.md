@@ -1,6 +1,10 @@
 # Mini-Amazon
 CS 316 mini Amazon project
 
+### Demo Video Link
+
+https://duke.box.com/s/n8z24hjet9l84c4lncctfndo7j3q94q9
+
 ### Deployment
 
 The server is deployed on a virtual machine. Please visit the address http://vcm-16419.vm.duke.edu:5000
