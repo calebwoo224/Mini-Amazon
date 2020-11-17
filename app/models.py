@@ -9,7 +9,7 @@ from app import login
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(20), unique=True)
-    email = db.Column(db.String(120))
+    email = db.Column(db.String(120), unique=True)
     password_hash = db.Column(db.String(128))
     security_question = db.Column(db.String(250))
     security_answer = db.Column(db.String(250))
